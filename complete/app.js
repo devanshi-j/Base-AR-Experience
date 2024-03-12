@@ -322,32 +322,28 @@ class App{
         this.camera.updateProjectionMatrix();
         this.renderer.setSize( window.innerWidth, window.innerHeight );  
     }
-    
-	render(timestamp, frame) {   
-        const clock = this.clock.getDelta();
-        this.stats.update();
-        if ( this.renderer.xr.isPresenting ){
-            this.gestures.update();
-            this.ui.update();
-        }
-        if ( this.knight !== undefined ) this.knight.update(dt);
-        this.renderer.render( this.scene, this.camera );
-        
-        const clock = this.clock.getDelta();
-        if (this.knight) this.knight.update(dt);
 
-        const self = this;
-        
-        if ( frame ) {
+    render(timestamp, frame) {
+  const dt = this.clock.getDelta(); // Calculate delta time once
 
-            if ( this.hitTestSourceRequested === false ) this.requestHitTestSource( )
+  this.stats.update();
 
-            if ( this.hitTestSource ) this.getHitTestResults( frame );
-   
-   
-    }
-    }
+  if (this.renderer.xr.isPresenting) {
+    this.gestures.update();
+    this.ui.update();
+  }
 
+  if (this.knight !== undefined) this.knight.update(dt);
+
+  this.renderer.render(this.scene, this.camera);
+
+  if (frame) {
+    if (this.hitTestSourceRequested === false) this.requestHitTestSource();
+
+    if (this.hitTestSource) this.getHitTestResults(frame);
+  }
 }
+	
+        
 
 export { App };
