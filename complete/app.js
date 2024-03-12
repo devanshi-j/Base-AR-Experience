@@ -333,7 +333,7 @@ class App{
         if ( this.knight !== undefined ) this.knight.update(dt);
         this.renderer.render( this.scene, this.camera );
         
-        const dt = this.clock.getDelta();
+        const clock = this.clock.getDelta();
         if (this.knight) this.knight.update(dt);
 
         const self = this;
