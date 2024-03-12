@@ -343,7 +343,8 @@ class App{
     if (this.hitTestSource) this.getHitTestResults(frame);
   }
 }
-	
+
+}
         
 
 export { App };
