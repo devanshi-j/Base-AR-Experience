@@ -9,7 +9,7 @@ class ControllerGestures extends THREE.EventDispatcher{
             return;
         }
 
-        startVector = undefined; // Removed initialization from constructor
+        
         
         const clock = new THREE.Clock();
         
