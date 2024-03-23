@@ -265,7 +265,7 @@ class App {
 	this.gestures.addEventListener('rotate', (ev) => {
           if (ev.initialise !== undefined) {
      self.startQuaternion = self.knight.object.quaternion.clone();
-     else {
+	  } else {
      // Construct the rotation quaternion directly
      const rotationQuaternion = new THREE.Quaternion()
      .setFromAxisAngle(new THREE.Vector3(ev.axis), ev.theta);
