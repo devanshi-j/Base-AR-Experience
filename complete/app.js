@@ -261,11 +261,11 @@ class App {
                 self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}`);
             }
         });
-        
-        // ...inside the 'rotate' event listener
-        if (ev.initialise !== undefined) {
+
+	function myFunction(ev) {
+          if (ev.initialise !== undefined) {
      self.startQuaternion = self.knight.object.quaternion.clone();
-     } else {
+     else {
      // Construct the rotation quaternion directly
      const rotationQuaternion = new THREE.Quaternion()
      .setFromAxisAngle(new THREE.Vector3(ev.axis), ev.theta);
@@ -281,7 +281,8 @@ class App {
      self.knight.object.rotateX( ev.theta );
 
   self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
-}
+} 
+    }
 
       this.renderer.setAnimationLoop(this.render.bind(this));
      
