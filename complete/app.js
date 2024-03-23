@@ -264,19 +264,24 @@ class App {
         
         // ...inside the 'rotate' event listener
         if (ev.initialise !== undefined) {
-        self.startQuaternion = self.knight.object.quaternion.clone();
-        } else {
-        // Construct the rotation quaternion directly
-        const rotationQuaternion = new THREE.Quaternion()
-        .setFromAxisAngle(new THREE.Vector3(ev.axis), ev.theta);
-         self.knight.object.quaternion.multiply(rotationQuaternion);
-         // Update reticle position
-         self.reticle.matrixWorldNeedsUpdate = true;
-        // Optionally, consider adjusting reticle orientation based on rotation
-        self.knight.object.quaternion.copy( self.startQuaternion );
-        self.knight.object.rotateY( ev.theta );
-        self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`
-        )};
+     self.startQuaternion = self.knight.object.quaternion.clone();
+     } else {
+     // Construct the rotation quaternion directly
+     const rotationQuaternion = new THREE.Quaternion()
+     .setFromAxisAngle(new THREE.Vector3(ev.axis), ev.theta);
+     self.knight.object.quaternion.multiply(rotationQuaternion);
+
+     // Update reticle position and optionally rotation
+     self.reticle.matrixWorldNeedsUpdate = true;
+
+      // Optionally consider adjusting reticle orientation based on rotation
+
+     //Remove or modify for desired Y-axis behavior
+     self.knight.object.rotateY( ev.theta );
+     self.knight.object.rotateX( ev.theta );
+
+  self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
+}
 
       this.renderer.setAnimationLoop(this.render.bind(this));
      
