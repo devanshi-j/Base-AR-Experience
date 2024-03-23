@@ -262,7 +262,7 @@ class App {
             }
         });
 
-	function myFunction(ev) {
+	this.gestures.addEventListener('rotate', (ev) => {
           if (ev.initialise !== undefined) {
      self.startQuaternion = self.knight.object.quaternion.clone();
      else {
@@ -282,7 +282,8 @@ class App {
 
   self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
 } 
-    }
+	}
+    
 
       this.renderer.setAnimationLoop(this.render.bind(this));
      
