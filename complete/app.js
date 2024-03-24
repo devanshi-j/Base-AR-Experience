@@ -341,15 +341,15 @@ class App {
     }
     
 
-    handleRotation(axis, theta) {
-        if (!this.knight) return;
-    
-        const rotationQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(axis), theta);
-        this.knight.object.quaternion.multiply(rotationQuaternion);
-    
-        // Update reticle position (consider visual cue for rotation axis)
-        this.reticle.matrixWorldNeedsUpdate = true;
-      }
+   handleRotation(axis, theta) {
+    if (!this.knight) return;
+
+    const rotationQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(axis), theta);
+    this.knight.object.quaternion.multiply(rotationQuaternion);
+
+    // Update reticle position (consider visual cue for rotation axis)
+    this.reticle.matrixWorldNeedsUpdate = true;
+}
 
     
     resize(){
