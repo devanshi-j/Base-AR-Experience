@@ -204,7 +204,7 @@ class App {
             const pose = hit.getPose(referenceSpace);
             this.reticle.visible = true;
             this.reticle.matrix.fromArray(pose.transform.matrix);
-        }         } else {
+           } else {
             this.reticle.visible = false;
         }
     }
