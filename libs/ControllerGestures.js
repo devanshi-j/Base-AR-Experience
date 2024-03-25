@@ -109,41 +109,43 @@ class ControllerGestures extends THREE.EventDispatcher{
         }
     }
 
-    handleRotation(axis, theta) {
-        if (!this.knight || !this.knight.object) return;
-    
-        // Apply rotation damping (optional)
-        const dampingFactor = 0.1; // Adjust damping for desired sensitivity
-        theta *= dampingFactor;
-    
-        // Initialize startVector for rotation tracking
-        if (this.startVector === undefined) {
-          this.startVector = new THREE.Vector3();
-        }
-    
-        const rotationQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(axis), theta);
-        this.knight.object.quaternion.multiply(rotationQuaternion);
-    
-        // Update reticle position and rotation based on the knight's transform (optional)
+   handleRotation(axis, theta) {
+    if (!this.knight || !this.knight.object) return;
+
+    // Apply rotation damping (optional)
+    const dampingFactor = 0.1; // Adjust damping for desired sensitivity
+    theta *= dampingFactor;
+
+    // Initialize startVector for rotation tracking
+    if (this.startVector === undefined) {
+        this.startVector = new THREE.Vector3();
+    }
+
+    const rotationQuaternion = new THREE.Quaternion().setFromAxisAngle(axis, theta);
+    this.knight.object.quaternion.multiply(rotationQuaternion);
+
+    // Update reticle position and rotation based on the knight's transform (optional)
+    if (this.reticle) {
         this.reticle.position.copy(this.knight.object.position);
         this.reticle.quaternion.copy(this.knight.object.quaternion);
-      }
-    
+    }
+}
 
-      getSwipeDirection(currentPosition, startPosition) {
-        const swipeThreshold = 0.1; // Adjust threshold based on desired swipe sensitivity
-        const deltaX = Math.abs(currentPosition.x - startPosition.x);
-        const deltaY = Math.abs(currentPosition.y - startPosition.y);
-      
-        if (deltaY > swipeThreshold && deltaY > deltaX) {
-          return deltaY > 0 ? 'swipe_down' : 'swipe_up';
-        } else if (deltaX > swipeThreshold && deltaX > deltaY) {
-          return deltaX > 0 ? 'swipe_right' : 'swipe_left';
-        } else {
-          return 'unknown'; // No significant swipe detected
-        }
-      }
-      
+    
+getSwipeDirection(currentPosition, startPosition) {
+    const swipeThreshold = 0.1; // Adjust threshold based on desired swipe sensitivity
+    const deltaX = Math.abs(currentPosition.x - startPosition.x);
+    const deltaY = Math.abs(currentPosition.y - startPosition.y);
+
+    if (deltaY > swipeThreshold && deltaY > deltaX) {
+        return currentPosition.y > startPosition.y ? 'swipe_down' : 'swipe_up';
+    } else if (deltaX > swipeThreshold && deltaX > deltaY) {
+        return currentPosition.x > startPosition.x ? 'swipe_right' : 'swipe_left';
+    } else {
+        return 'unknown'; // No significant swipe detected
+    }
+}
+
     
     get multiTouch(){
         let result;
@@ -172,126 +174,122 @@ class ControllerGestures extends THREE.EventDispatcher{
         return this.type;
     }
     
-    update(){
-        const data1 = this.controller1.userData.gestures;
-        const data2 = this.controller2.userData.gestures;
-        const currentTime = this.clock.getElapsedTime();
-        
-        let elapsedTime;
-        
-        if (this.controller1.userData.selectPressed && data1.startPosition === undefined){
-            elapsedTime = currentTime - data1.startTime;
-            if (elapsedTime > 0.05 ) data1.startPosition = this.controller1.position.clone();
-        }
-        
-        if (this.controller2.userData.selectPressed && data2.startPosition === undefined){
-            elapsedTime = currentTime - data2.startTime;
-            if (elapsedTime > 0.05 ) data2.startPosition = this.controller2.position.clone();
-        }
-        
-        if (!this.controller1.userData.selectPressed && this.type === 'tap' ){
-            //Only dispatch event after double click limit is passed
-            elapsedTime = this.clock.getElapsedTime() - data1.endTime;
-            if (elapsedTime > this.doubleClickLimit){
-                //console.log( `ControllerGestures.update dispatchEvent taps:${data1.taps}` );
-                switch( data1.taps ){
-                    case 1:
-                        this.dispatchEvent( { type: 'tap', position: this.controller1.position, matrixWorld: this.controller1.matrixWorld } );
-                        break;
-                    case 2:
-                        this.dispatchEvent( { type: 'doubletap', position: this.controller1.position, matrixWorld: this.controller1.matrixWorld } );
-                        break;
-                    case 3:
-                        this.dispatchEvent( { type: 'tripletap', position: this.controller1.position, matrixWorld: this.controller1.matrixWorld } );
-                        break;
-                    case 4:
-                        this.dispatchEvent( { type: 'quadtap', position: this.controller1.position, matrixWorld: this.controller1.matrixWorld }  );
-                        break;
-                }
-                this.type = "unknown";
-                data1.taps = 0;
+   update(){
+    const data1 = this.controller1.userData.gestures;
+    const data2 = this.controller2.userData.gestures;
+    const currentTime = this.clock.getElapsedTime();
+    
+    let elapsedTime;
+    
+    if (this.controller1.userData.selectPressed && data1.startPosition === undefined){
+        elapsedTime = currentTime - data1.startTime;
+        if (elapsedTime > 0.05 ) data1.startPosition = this.controller1.position.clone();
+    }
+    
+    if (this.controller2.userData.selectPressed && data2.startPosition === undefined){
+        elapsedTime = currentTime - data2.startTime;
+        if (elapsedTime > 0.05 ) data2.startPosition = this.controller2.position.clone();
+    }
+    
+    if (!this.controller1.userData.selectPressed && this.type === 'tap' ){
+        //Only dispatch event after double click limit is passed
+        elapsedTime = this.clock.getElapsedTime() - data1.endTime;
+        if (elapsedTime > this.doubleClickLimit){
+            switch( data1.taps ){
+                case 1:
+                    this.dispatchEvent( { type: 'tap', position: this.controller1.position.clone(), matrixWorld: this.controller1.matrixWorld.clone() } );
+                    break;
+                case 2:
+                    this.dispatchEvent( { type: 'doubletap', position: this.controller1.position.clone(), matrixWorld: this.controller1.matrixWorld.clone() } );
+                    break;
+                case 3:
+                    this.dispatchEvent( { type: 'tripletap', position: this.controller1.position.clone(), matrixWorld: this.controller1.matrixWorld.clone() } );
+                    break;
+                case 4:
+                    this.dispatchEvent( { type: 'quadtap', position: this.controller1.position.clone(), matrixWorld: this.controller1.matrixWorld.clone() }  );
+                    break;
             }
-        }
-          if (this.type === 'unknown' && this.touch){
-            if (data1.startPosition !== undefined){
-                if (this.multiTouch){
-                    if (data2.startPosition !== undefined){
-                        //startPosition is undefined for 1/20 sec
-                        //test for pinch or rotate
-                        const startDistance = data1.startPosition.distanceTo( data2.startPosition );
-                        const currentDistance = this.controller1.position.distanceTo( this.controller2.position );
-                        const delta = currentDistance - startDistance;
-                        if ( Math.abs(delta) > 0.01 ){
-                            this.type = 'pinch';
-                            this.startDistance = this.controller1.position.distanceTo( this.controller2.position );
-                            this.dispatchEvent( { type: 'pinch', delta: 0, scale: 1, initialise: true } );
-                        }else{
-                            const v1 = data2.startPosition.clone().sub( data1.startPosition ).normalize();
-                            const v2 = this.controller2.position.clone().sub( this.controller1.position ).normalize();
-                            const theta = v1.angleTo( v2 );
-                            if (Math.abs(theta) > 0.2){
-                                this.type = 'rotate';
-                                this.startVector = v2.clone();
-                                this.dispatchEvent( { type: 'rotate', theta: 0, initialise: true } );
-                            
-                            }
-                        }
-                    }
-                }else{
-                    //test for swipe or pan
-                    let dist = data1.startPosition.distanceTo( this.controller1.position );
-                    elapsedTime = this.clock.getElapsedTime() - data1.startTime;
-                    const velocity = dist/elapsedTime;
-                    //console.log(`dist:${dist.toFixed(3)} velocity:${velocity.toFixed(3)}`);
-                    if (this.type === 'rotate') {
-                        const v = this.controller2.position.clone().sub(this.controller1.position).normalize();
-                        let theta = this.startVector.angleTo(v);
-                        const cross = this.startVector.clone().cross(v);
-                        if (this.up.dot(cross) > 0) theta = -theta;
-                  
-                        this.dispatchEvent({ type: 'rotate', theta });
-                  
-                        if (this.type === 'rotate') {
-                          handleRotation(this.up, theta); // Rotate around the up axis
-                          this.startVector = v.clone(); // Update startVector for subsequent rotations
-                        }
-                      }
-                    if ( dist > 0.01 && velocity > 0.1 ){
-                        const v = this.controller1.position.clone().sub( data1.startPosition );
-                        let maxY = (Math.abs(v.y) > Math.abs(v.x)) && (Math.abs(v.y) > Math.abs(v.z));
-                        if ( maxY )this.type = "swipe";
-                    }else if (dist > 0.006 && velocity < 0.03){
-                        this.type = "pan";
-                        this.startPosition = this.controller1.position.clone();
-                        this.dispatchEvent( { type: 'pan', delta: new THREE.Vector3(), initialise: true } );
-                    }
-                }
-            }
-        }else if (this.type === 'pinch'){
-            const currentDistance = this.controller1.position.distanceTo( this.controller2.position );
-            const delta = currentDistance - this.startDistance;
-            const scale = currentDistance/this.startDistance;
-            this.dispatchEvent( { type: 'pinch', delta, scale });
-        }else if (this.type === 'rotate'){
-            const v = this.controller2.position.clone().sub( this.controller1.position ).normalize();
-            let theta = this.startVector.angleTo( v );
-            const cross = this.startVector.clone().cross( v );
-            if (this.up.dot(cross) > 0) theta = -theta;
-            this.dispatchEvent( { type: 'rotate', theta } );
-            if (this.type === 'rotate') {
-                const v = this.controller2.position.clone().sub(this.controller1.position).normalize();
-                handleRotation(this.startVector, v);
-                this.startVector = v.clone(); // Update startVector for subsequent rotations
-              }
-        }else if (this.type === 'pan'){
-            const delta = this.controller1.position.clone().sub( this.startPosition );
-            this.dispatchEvent( { type: 'pan', delta } );
-            if (self.type === 'drag'){
-            const delta = this.controller1.position.clone().sub(data1.startPosition);
-            self.knight.object.position.add(delta);
-          }
+            this.type = "unknown";
+            data1.taps = 0;
         }
     }
+    
+    if (this.type === 'unknown' && this.touch){
+        if (data1.startPosition !== undefined){
+            if (this.multiTouch){
+                if (data2.startPosition !== undefined){
+                    const startDistance = data1.startPosition.distanceTo( data2.startPosition );
+                    const currentDistance = this.controller1.position.distanceTo( this.controller2.position );
+                    const delta = currentDistance - startDistance;
+                    if ( Math.abs(delta) > 0.01 ){
+                        this.type = 'pinch';
+                        this.startDistance = this.controller1.position.distanceTo( this.controller2.position );
+                        this.dispatchEvent( { type: 'pinch', delta: 0, scale: 1, initialise: true } );
+                    }else{
+                        const v1 = data2.startPosition.clone().sub( data1.startPosition ).normalize();
+                        const v2 = this.controller2.position.clone().sub( this.controller1.position ).normalize();
+                        const theta = v1.angleTo( v2 );
+                        if (Math.abs(theta) > 0.2){
+                            this.type = 'rotate';
+                            this.startVector = v2.clone();
+                            this.dispatchEvent( { type: 'rotate', theta: 0, initialise: true } );
+                        
+                        }
+                    }
+                }
+            }else{
+                let dist = data1.startPosition.distanceTo( this.controller1.position );
+                elapsedTime = this.clock.getElapsedTime() - data1.startTime;
+                const velocity = dist/elapsedTime;
+                if (this.type === 'rotate') {
+                    const v = this.controller2.position.clone().sub(this.controller1.position).normalize();
+                    let theta = this.startVector.angleTo(v);
+                    const cross = this.startVector.clone().cross(v);
+                    if (this.up.dot(cross) > 0) theta = -theta;
+              
+                    this.dispatchEvent({ type: 'rotate', theta });
+              
+                    if (this.type === 'rotate') {
+                      handleRotation(this.up, theta); // Rotate around the up axis
+                      this.startVector = v.clone(); // Update startVector for subsequent rotations
+                    }
+                }
+                if ( dist > 0.01 && velocity > 0.1 ){
+                    const v = this.controller1.position.clone().sub( data1.startPosition );
+                    let maxY = (Math.abs(v.y) > Math.abs(v.x)) && (Math.abs(v.y) > Math.abs(v.z));
+                    if ( maxY ) this.type = "swipe";
+                }else if (dist > 0.006 && velocity < 0.03){
+                    this.type = "pan";
+                    this.startPosition = this.controller1.position.clone();
+                    this.dispatchEvent( { type: 'pan', delta: new THREE.Vector3(), initialise: true } );
+                }
+            }
+        }
+    }else if (this.type === 'pinch'){
+        const currentDistance = this.controller1.position.distanceTo( this.controller2.position );
+        const delta = currentDistance - this.startDistance;
+        const scale = currentDistance/this.startDistance;
+        this.dispatchEvent( { type: 'pinch', delta, scale });
+    }else if (this.type === 'rotate'){
+        const v = this.controller2.position.clone().sub( this.controller1.position ).normalize();
+        let theta = this.startVector.angleTo( v );
+        const cross = this.startVector.clone().cross( v );
+        if (this.up.dot(cross) > 0) theta = -theta;
+        this.dispatchEvent( { type: 'rotate', theta } );
+        if (this.type === 'rotate') {
+            const v = this.controller2.position.clone().sub(this.controller1.position).normalize();
+            handleRotation(this.startVector, v);
+            this.startVector = v.clone(); // Update startVector for subsequent rotations
+          }
+    }else if (this.type === 'pan'){
+        const delta = this.controller1.position.clone().sub( this.startPosition );
+        this.dispatchEvent( { type: 'pan', delta } );
+        if (this.type === 'drag'){
+        const delta = this.controller1.position.clone().sub(data1.startPosition);
+        this.knight.object.position.add(delta);
+      }
+    }
+}
 }
             
 
