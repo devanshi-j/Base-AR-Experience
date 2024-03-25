@@ -202,7 +202,8 @@ class App {
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`  );
             }
         });
-        
+        this.renderer.setAnimationLoop(this.render.bind(this));
+    }
 
         this.controller = this.renderer.xr.getController(0);
         this.controller.addEventListener('select', onSelect);
