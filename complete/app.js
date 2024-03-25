@@ -248,6 +248,7 @@ class App {
 
 
         // Add hit test functionality
+       
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
         this.reticle = new THREE.Mesh(
@@ -259,7 +260,7 @@ class App {
         this.scene.add(this.reticle);
 
         this.renderer.setAnimationLoop(this.render.bind(this));
-    }
+    
 
     requestHitTestSource() {
         const self = this;
