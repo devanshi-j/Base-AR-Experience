@@ -76,6 +76,10 @@ class App {
     }
 
     initScene() {
+
+        this.loadingBar = new LoadingBar();
+
+        this.assetsPath = '../assets/';
         const loader = new GLTFLoader().setPath(this.assetsPath);
         const self = this;
 
@@ -110,6 +114,8 @@ class App {
                 self.knight.action = 'Dance';
                 const scale = 0.003;
                 self.knight.object.scale.set(scale, scale, scale);
+
+                 
 
                 self.loadingBar.visible = false;
             },
