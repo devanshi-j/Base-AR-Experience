@@ -167,7 +167,7 @@ class App {
     setupXR() {
         this.renderer.xr.enabled = true;
 
-        const btn = new ARButton(this.renderer, { onSelect, offselect });
+        const btn = new ARButton(this.renderer, { onSessionstart, onSessionend });
 
         const self = this;
         let controller1, controller2;
