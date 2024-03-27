@@ -167,7 +167,7 @@ class App {
     setupXR() {
         this.renderer.xr.enabled = true;
 
-        const btn = new ARButton(this.renderer, { onSessionstart, onSessionend });
+        const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd });
 
         const self = this;
         let controller1, controller2;
@@ -176,7 +176,7 @@ class App {
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
 
-        /*function onSessionStart() {
+        function onSessionStart() {
           self.ui.mesh.position.set(0, -0.15, -0.3);
           self.camera.add(self.ui.mesh);
     
@@ -200,7 +200,7 @@ class App {
           }
           referenceSpace = null;
           isHitTestRequested = false;
-        }*/
+        }
 
        
 
