@@ -130,14 +130,23 @@ loadKnight(){
 	}		
     
     initScene(){
-        /*this.reticle = new THREE.Mesh(
+        this.reticle = new THREE.Mesh(
             new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
             new THREE.MeshBasicMaterial()
         );
         
         this.reticle.matrixAutoUpdate = false;
         this.reticle.visible = false;
-        this.scene.add( this.reticle );*/
+       
+
+	if (object instanceof THREE.Object3D) {
+    // Object is a valid THREE.Object3D instance, so add it to the scene
+     this.scene.add( this.reticle );
+     } else {
+    console.error('Error: Object is not an instance of THREE.Object3D', object);
+    // Handle the error as needed
+}
+
         
         this.loadKnight();
 
@@ -196,7 +205,15 @@ loadKnight(){
 
         const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd });
 
+        //this.scene.add(this.controller);
+
+	if (this.controller instanceof THREE.Object3D) {
         this.scene.add(this.controller);
+        } else {
+        console.error('Error: this.controller is not an instance of THREE.Object3D');
+        // Handle the error appropriately
+        }
+
 
         this.gestures = new ControllerGestures(this.renderer);
         this.gestures.addEventListener('tap', (ev) => {
