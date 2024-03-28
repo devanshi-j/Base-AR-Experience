@@ -51,6 +51,7 @@ class App {
         this.euler = new THREE.Euler();
         this.quaternion = new THREE.Quaternion();
 
+        this.loadKnight();
         this.initScene();
         this.setupXR();
 
@@ -81,48 +82,62 @@ class App {
     }
 
     loadKnight() {
+        this.loadingBar = new LoadingBar();
+        
+        this.assetsPath = '../assets/';
         const loader = new GLTFLoader().setPath(this.assetsPath);
-        const self = this;
-
-        // Load a GLTF resource
-        loader.load(
-            // resource URL
-            `knight2.glb`,
-            // called when the resource is loaded
-            function (gltf) {
-                const object = gltf.scene.children[5];
-
-                const options = {
-                    object: object,
-                    speed: 0.5,
-                    assetsPath: self.assetsPath,
-                    loader: loader,
-                    animations: gltf.animations,
-                    clip: gltf.animations[0],
-                    app: self,
-                    name: 'knight',
-                    npc: false
-                };
-
-                self.knight = new Player(options);
+		const self = this;
+		
+		// Load a GLTF resource
+		loader.load(
+			// resource URL
+			`knight2.glb`,
+			// called when the resource is loaded
+			function ( gltf ) {
+				const object = gltf.scene.children[5];
+				
+				object.traverse(function(child){
+					if (child.isMesh){
+                        child.material.metalness = 0;
+                        child.material.roughness = 1;
+					}
+				});
+				
+				const options = {
+					object: object,
+					speed: 0.5,
+					animations: gltf.animations,
+					clip: gltf.animations[0],
+					app: self,
+					name: 'knight',
+					npc: false
+				};
+				
+				self.knight = new Player(options);
                 self.knight.object.visible = false;
-
-                self.knight.action = 'Dance';
-                const scale = 0.005;
-                self.knight.object.scale.set(scale, scale, scale);
-
+				
+				self.knight.action = 'Dance';
+				const scale = 0.003;
+				self.knight.object.scale.set(scale, scale, scale); 
+				
                 self.loadingBar.visible = false;
-                self.renderer.setAnimationLoop(self.render.bind(self));
-            },
-            // called while loading is progressing
-            function (xhr) {
-                self.loadingBar.progress = (xhr.loaded / xhr.total);
-            },
-            // called when loading has errors
-            function (error) {
-                console.log('An error happened');
-            }
-        );
+			},
+			// called while loading is progressing
+			function ( xhr ) {
+
+				self.loadingBar.progress = (xhr.loaded / xhr.total);
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+        
+        
+    }
     }
 
     initScene() {
