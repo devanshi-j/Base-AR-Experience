@@ -133,7 +133,7 @@ class App {
                 self.reticle.visible = false;
                 self.scene.add(self.reticle);
 
-                self.loadKnight();
+               
             },
             function (xhr) {
                 self.loadingBar.progress = (xhr.loaded / xhr.total);
