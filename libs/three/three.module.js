@@ -47496,7 +47496,7 @@ Object.assign( Quaternion.prototype, {
 	},
 	inverse: function ( ) {
 
-		console.warn( 'THREE.Quaternion: .inverse() has been renamed to invert().' );
+		//console.warn( 'THREE.Quaternion: .inverse() has been renamed to invert().' );
 		return this.invert();
 
 	}
