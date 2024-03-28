@@ -113,8 +113,8 @@ loadKnight(){
 				const scale = 0.005;
 				self.knight.object.scale.set(scale, scale, scale); 
 				
-                self.loadingBar.visible = false;
-                self.renderer.setAnimationLoop( self.render.bind(self) );//(timestamp, frame) => { self.render(timestamp, frame); } );
+                                self.loadingBar.visible = false;
+                                 self.renderer.setAnimationLoop( self.render.bind(self) );//(timestamp, frame) => { self.render(timestamp, frame); } );
 			},
 			// called while loading is progressing
 			function ( xhr ) {
@@ -210,12 +210,12 @@ loadKnight(){
 
         //this.scene.add(this.controller);
 
-	if (this.controller instanceof THREE.Object3D) {
+	/*if (this.controller instanceof THREE.Object3D) {
         this.scene.add(this.controller);
         } else {
         console.error('Error: this.controller is not an instance of THREE.Object3D');
         // Handle the error appropriately
-        }
+        }*/
 
 
         this.gestures = new ControllerGestures(this.renderer);
