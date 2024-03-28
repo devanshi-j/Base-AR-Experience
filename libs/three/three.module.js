@@ -47527,12 +47527,10 @@ Object.assign( Quaternion.prototype, {
 		return vector.applyQuaternion( this );
 
 	},
-	inverse: function ( ) {
-
-		console.warn( 'THREE.Quaternion: .inverse() has been renamed to invert().' );
-		return this.invert();
-
-	}
+	inverse: function () {
+    console.warn('THREE.Quaternion: .inverse() has been renamed to invert().');
+    return this.invert();
+}
 
 } );
 
