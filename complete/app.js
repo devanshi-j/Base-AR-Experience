@@ -150,7 +150,7 @@ loadKnight(){
         
         this.loadKnight();
 
-	this.createUI
+	this.createUI();
     }
     
    
