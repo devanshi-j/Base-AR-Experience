@@ -85,37 +85,8 @@ class App {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    loadKnight() {
-        const loader = new GLTFLoader().setPath(this.assetsPath);
-        loader.load(
-            'knight2.glb',
-            (gltf) => {
-                const object = gltf.scene;
-                object.scale.set(0.5, 0.5, 0.5); // Adjust scale if needed
-
-                // Position the knight model
-                object.position.set(0, 0, 0); // Adjust position if needed
-
-                this.scene.add(object);
-
-                // Hide loading bar once loaded
-                this.loadingBar.visible = false;
-            },
-            (xhr) => {
-                // Track loading progress
-                this.loadingBar.progress = xhr.loaded / xhr.total;
-            },
-            (error) => {
-                console.error('Error loading knight model', error);
-            }
-        );
-    }
-
-    
-
-    initScene() {
+    }            
+ initScene() {
         this.loadingBar = new LoadingBar();
 
         this.assetsPath = '../assets/';
@@ -162,10 +133,10 @@ class App {
                 self.reticle.visible = false;
                 self.scene.add(self.reticle);
 
-                this.loadKnight();
+                self.loadKnight();
             },
             function (xhr) {
-                this.loadingBar.progress = (xhr.loaded / xhr.total);
+                self.loadingBar.progress = (xhr.loaded / xhr.total);
             },
             function (error) {
                 console.log('An error happened');
