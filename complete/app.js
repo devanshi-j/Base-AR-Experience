@@ -165,7 +165,7 @@ class App {
                 this.loadKnight();
             },
             function (xhr) {
-                self.loadingBar.progress = (xhr.loaded / xhr.total);
+                this.loadingBar.progress = (xhr.loaded / xhr.total);
             },
             function (error) {
                 console.log('An error happened');
