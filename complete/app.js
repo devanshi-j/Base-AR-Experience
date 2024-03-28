@@ -16,13 +16,15 @@ class App {
 
         this.clock = new THREE.Clock();
 
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 200);
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 200);
 
         this.scene = new THREE.Scene();
 
         this.scene.add(this.camera);
 
-        this.scene.add(new THREE.HemisphereLight(0x606060, 0x404040));
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+        hemiLight.position.set(0, 20, 0);
+        this.scene.add(hemiLight);
 
         const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 2);
         ambient.position.set(0.5, 1, 0.25);
@@ -51,8 +53,10 @@ class App {
         this.euler = new THREE.Euler();
         this.quaternion = new THREE.Quaternion();
 
+        this.setEnvironment();
         this.initScene();
         this.setupXR();
+        
 
         window.addEventListener('resize', this.resize.bind(this));
     }
@@ -68,7 +72,7 @@ class App {
             const envMap = pmremGenerator.fromEquirectangular(texture).texture;
             pmremGenerator.dispose();
 
-            self.scene.environment = envMap;
+            this.scene.environment = envMap;
 
         }, undefined, (err) => {
             console.error('An error occurred setting the environment');
@@ -76,10 +80,40 @@ class App {
     }
 
     resize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
+
+    loadKnight() {
+        const loader = new GLTFLoader().setPath(this.assetsPath);
+        loader.load(
+            'knight2.glb',
+            (gltf) => {
+                const object = gltf.scene;
+                object.scale.set(0.5, 0.5, 0.5); // Adjust scale if needed
+
+                // Position the knight model
+                object.position.set(0, 0, 0); // Adjust position if needed
+
+                this.scene.add(object);
+
+                // Hide loading bar once loaded
+                this.loadingBar.visible = false;
+            },
+            (xhr) => {
+                // Track loading progress
+                this.loadingBar.progress = xhr.loaded / xhr.total;
+            },
+            (error) => {
+                console.error('Error loading knight model', error);
+            }
+        );
+    }
+
+    
 
     initScene() {
         this.loadingBar = new LoadingBar();
@@ -128,7 +162,7 @@ class App {
                 self.reticle.visible = false;
                 self.scene.add(self.reticle);
 
-                self.loadKnight();
+                this.loadKnight();
             },
             function (xhr) {
                 self.loadingBar.progress = (xhr.loaded / xhr.total);
@@ -350,8 +384,12 @@ class App {
         if (this.knight !== undefined) this.knight.update(dt);
 
         this.renderer.render(this.scene, this.camera);
+        requestAnimationFrame(this.render.bind(this));
     }
 }
+
+const app = new App();
+app.render();
 
 export { App };
 
