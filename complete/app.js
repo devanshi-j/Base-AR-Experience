@@ -18,7 +18,7 @@ class App {
 
         this.loadingBar = new LoadingBar();
 
-        this.assetsPath = '../assets/';
+	this.assetsPath = '../assets/';
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 200);
         this.camera.position.set(0, 1.6, 3);
@@ -80,12 +80,8 @@ class App {
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
-
-    loadKnight() {
-        this.loadingBar = new LoadingBar();
-        
-        this.assetsPath = '../assets/';
-        const loader = new GLTFLoader().setPath(this.assetsPath);
+loadKnight(){
+	    const loader = new GLTFLoader().setPath(this.assetsPath);
 		const self = this;
 		
 		// Load a GLTF resource
@@ -96,17 +92,12 @@ class App {
 			function ( gltf ) {
 				const object = gltf.scene.children[5];
 				
-				object.traverse(function(child){
-					if (child.isMesh){
-                        child.material.metalness = 0;
-                        child.material.roughness = 1;
-					}
-				});
-				
 				const options = {
 					object: object,
 					speed: 0.5,
-					animations: gltf.animations,
+					assetsPath: self.assetsPath,
+					loader: loader,
+                    animations: gltf.animations,
 					clip: gltf.animations[0],
 					app: self,
 					name: 'knight',
@@ -117,10 +108,11 @@ class App {
                 self.knight.object.visible = false;
 				
 				self.knight.action = 'Dance';
-				const scale = 0.003;
+				const scale = 0.005;
 				self.knight.object.scale.set(scale, scale, scale); 
 				
                 self.loadingBar.visible = false;
+                self.renderer.setAnimationLoop( self.render.bind(self) );//(timestamp, frame) => { self.render(timestamp, frame); } );
 			},
 			// called while loading is progressing
 			function ( xhr ) {
@@ -135,26 +127,24 @@ class App {
 
 			}
 		);
-        
-        
-    }
-    }
-
-    initScene() {
+	}		
+    
+    initScene(){
         this.reticle = new THREE.Mesh(
-            new THREE.RingBufferGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2),
+            new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
             new THREE.MeshBasicMaterial()
         );
-
+        
         this.reticle.matrixAutoUpdate = false;
         this.reticle.visible = false;
-        this.scene.add(this.reticle);
-
+        this.scene.add( this.reticle );
+        
         this.loadKnight();
 
-        this.createUI();
+	this.createUI
     }
-
+    
+   
     createUI() {
         const config = {
             panelSize: { width: 0.15, height: 0.038 },
