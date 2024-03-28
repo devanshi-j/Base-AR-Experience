@@ -105,7 +105,9 @@ loadKnight(){
 				};
 				
 				self.knight = new Player(options);
-                self.knight.object.visible = false;
+
+				// Set the knight's object to be visible after creation
+                                self.knight.object.visible = true;
 				
 				self.knight.action = 'Dance';
 				const scale = 0.005;
@@ -130,6 +132,7 @@ loadKnight(){
 	}		
     
     initScene(){
+	
         this.reticle = new THREE.Mesh(
             new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
             new THREE.MeshBasicMaterial()
@@ -137,15 +140,15 @@ loadKnight(){
         
         this.reticle.matrixAutoUpdate = false;
         this.reticle.visible = false;
-       
+        this.scene.add(this.reticle);
 
 	if (object instanceof THREE.Object3D) {
     // Object is a valid THREE.Object3D instance, so add it to the scene
-     this.scene.add( this.reticle );
+     /*this.scene.add( this.reticle );
      } else {
     console.error('Error: Object is not an instance of THREE.Object3D', object);
     // Handle the error as needed
-}
+}*/
 
         
         this.loadKnight();
