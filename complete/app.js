@@ -142,7 +142,7 @@ loadKnight(){
         this.reticle.visible = false;
         this.scene.add(this.reticle);
 
-	if (object instanceof THREE.Object3D) {
+	/*if (object instanceof THREE.Object3D) {
     // Object is a valid THREE.Object3D instance, so add it to the scene
      /*this.scene.add( this.reticle );
      } else {
@@ -151,7 +151,7 @@ loadKnight(){
 }*/
 
         
-        this.loadKnight();
+    this.loadKnight();
 
 	this.createUI();
     }
@@ -347,25 +347,7 @@ loadKnight(){
 
     }
 
-    getHitTestResults(frame) {
-        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-
-        if (hitTestResults.length) {
-
-            const referenceSpace = this.renderer.xr.getReferenceSpace();
-            const hit = hitTestResults[0];
-            const pose = hit.getPose(referenceSpace);
-
-            this.reticle.visible = true;
-            this.reticle.matrix.fromArray(pose.transform.matrix);
-
-        } else {
-
-            this.reticle.visible = false;
-
-        }
-
-    }
+   
 
     render(timestamp, frame) {
         const dt = this.clock.getDelta();
@@ -380,9 +362,15 @@ loadKnight(){
             if (this.hitTestSource) this.getHitTestResults(frame);
 
         }
-
+    
         this.renderer.render(this.scene, this.camera);
     }
+
 }
 
+
+
 export { App };
+
+       
+        
