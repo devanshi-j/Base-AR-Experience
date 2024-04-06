@@ -51,7 +51,7 @@ class App {
         this.euler = new THREE.Euler();
         this.quaternion = new THREE.Quaternion();
 
-        this.loadKnight();
+       
         this.initScene();
         this.setupXR();
 
@@ -97,7 +97,7 @@ loadKnight(){
 					speed: 0.5,
 					assetsPath: self.assetsPath,
 					loader: loader,
-                    animations: gltf.animations,
+                                        animations: gltf.animations,
 					clip: gltf.animations[0],
 					app: self,
 					name: 'knight',
