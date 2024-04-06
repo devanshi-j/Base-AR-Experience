@@ -109,7 +109,7 @@ class ControllerGestures extends THREE.EventDispatcher{
         }
     }
 
-   /*handleRotation(axis, theta) {
+   handleRotation(axis, theta) {
     if (!this.knight || !this.knight.object) return;
 
     // Apply rotation damping (optional)
@@ -130,7 +130,7 @@ class ControllerGestures extends THREE.EventDispatcher{
         this.reticle.position.copy(this.knight.object.position);
         this.reticle.quaternion.copy(this.knight.object.quaternion);
     }
-}*/
+}
 
     
 getSwipeDirection(currentPosition, startPosition) {
@@ -226,7 +226,7 @@ getSwipeDirection(currentPosition, startPosition) {
                         this.type = 'pinch';
                         this.startDistance = this.controller1.position.distanceTo( this.controller2.position );
                         this.dispatchEvent( { type: 'pinch', delta: 0, scale: 1, initialise: true } );
-                    }/*else{
+                    }else{
                         const v1 = data2.startPosition.clone().sub( data1.startPosition ).normalize();
                         const v2 = this.controller2.position.clone().sub( this.controller1.position ).normalize();
                         const theta = v1.angleTo( v2 );
@@ -237,12 +237,12 @@ getSwipeDirection(currentPosition, startPosition) {
                         
                         }
                     }
-                }*/
+                }
             }else{
                 let dist = data1.startPosition.distanceTo( this.controller1.position );
                 elapsedTime = this.clock.getElapsedTime() - data1.startTime;
                 const velocity = dist/elapsedTime;
-                /*if (this.type === 'rotate') {
+                if (this.type === 'rotate') {
                     const v = this.controller2.position.clone().sub(this.controller1.position).normalize();
                     let theta = this.startVector.angleTo(v);
                     const cross = this.startVector.clone().cross(v);
@@ -254,7 +254,7 @@ getSwipeDirection(currentPosition, startPosition) {
                       handleRotation(this.up, theta); // Rotate around the up axis
                       this.startVector = v.clone(); // Update startVector for subsequent rotations
                     }
-                }*/
+                }
                 if ( dist > 0.01 && velocity > 0.1 ){
                     const v = this.controller1.position.clone().sub( data1.startPosition );
                     let maxY = (Math.abs(v.y) > Math.abs(v.x)) && (Math.abs(v.y) > Math.abs(v.z));
@@ -271,7 +271,7 @@ getSwipeDirection(currentPosition, startPosition) {
         const delta = currentDistance - this.startDistance;
         const scale = currentDistance/this.startDistance;
         this.dispatchEvent( { type: 'pinch', delta, scale });
-    }/*else if (this.type === 'rotate'){
+    }else if (this.type === 'rotate'){
         const v = this.controller2.position.clone().sub( this.controller1.position ).normalize();
         let theta = this.startVector.angleTo( v );
         const cross = this.startVector.clone().cross( v );
@@ -282,7 +282,7 @@ getSwipeDirection(currentPosition, startPosition) {
             handleRotation(this.startVector, v);
             this.startVector = v.clone(); // Update startVector for subsequent rotations
           }
-    }*/else if (this.type === 'pan'){
+    }else if (this.type === 'pan'){
         const delta = this.controller1.position.clone().sub( this.startPosition );
         this.dispatchEvent( { type: 'pan', delta } );
         if (this.type === 'drag'){
