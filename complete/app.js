@@ -277,7 +277,7 @@ loadKnight(){
         });
         
         // ...inside the 'rotate' event listener
-        if (ev.initialise !== undefined) {
+        /*if (ev.initialise !== undefined) {
         self.startQuaternion = self.knight.object.quaternion.clone();
         } else {
         // Construct the rotation quaternion directly
@@ -290,7 +290,18 @@ loadKnight(){
         self.knight.object.quaternion.copy( self.startQuaternion );
         self.knight.object.rotateY( ev.theta );
         self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`
-        )};
+        )};*/
+
+	 this.gestures.addEventListener( 'rotate', (ev)=>{
+            //      sconsole.log( ev ); 
+            if (ev.initialise !== undefined){
+                self.startQuaternion = self.knight.object.quaternion.clone();
+            }else{
+                self.knight.object.quaternion.copy( self.startQuaternion );
+                self.knight.object.rotateY( ev.theta );
+                self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`  );
+            }
+        });
 
         this.renderer.setAnimationLoop(this.render.bind(this));
      
