@@ -20,8 +20,8 @@ class App {
 
 	this.assetsPath = '../assets/';
 
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 200);
-        
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        this.camera.position.set(0, 0, 10);
 
         this.scene = new THREE.Scene();
 
@@ -167,7 +167,7 @@ loadKnight() {
             self.knight.object.scale.set(scale, scale, scale);
 
             // Initial position of the model (adjust as needed)
-            self.knight.object.position.set(0, 0, -2); // Example initial position
+           self.knight.object.position.set(0, 0, -5); // Example initial position
 
             self.loadingBar.visible = false;
             self.renderer.setAnimationLoop(self.render.bind(self));
@@ -301,7 +301,7 @@ function onSelect() {
         this.gestures.addEventListener('doubletap', (ev) => {
             self.ui.updateElement('info', 'doubletap');
         });
-        this.gestures.addEventListener('press', (ev) => {
+        /*this.gestures.addEventListener('press', (ev) => {
             if (ev.hand && !isDragging) {
                 isDragging = true;
                 dragStartPosition = self.knight.object.position.clone();
@@ -310,14 +310,27 @@ function onSelect() {
         });
         this.gestures.addEventListener('pressup', (ev) => {
             isDragging = false;
-        });
+        });*/
 
         this.gestures.addEventListener('move', (ev) => {
-            if (isDragging) {
-                const delta = ev.position.clone().sub(dragStartPosition);
-                self.knight.object.position.copy(dragStartPosition.add(delta));
-            }
-        });
+        if (self.knight && !isDragging) {
+            // Smoothly move the model based on user input
+            const delta = ev.position.clone().sub(self.startPosition);
+            self.knight.object.position.add(delta);
+        }
+
+
+	this.gestures.addEventListener('press', (ev) => {
+        if (ev.hand && !isDragging) {
+            isDragging = true;
+            self.startPosition = self.knight.object.position.clone();
+        }
+    });
+
+    this.gestures.addEventListener('pressup', (ev) => {
+        isDragging = false;
+    });
+    });
 
         this.gestures.addEventListener('pan', (ev) => {
             if (ev.initialise !== undefined) {
@@ -378,7 +391,7 @@ function onSelect() {
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
 
-        function onSelect() {
+        /*function onSelect() {
             if (self.knight === undefined) return;
 
             if (self.reticle.visible) {
@@ -393,6 +406,28 @@ function onSelect() {
         }
 
         this.controller = this.renderer.xr.getController(0);
+        this.controller.addEventListener('select', onSelect);*/
+
+	 function onSelect(event) {
+        if (self.knight === undefined) return;
+
+        const controller = event.target;
+        const session = self.renderer.xr.getSession();
+
+        if (self.reticle.visible && session) {
+            const hitTestResults = session.requestHitTest(controller.inputSource, self.reticle);
+
+            if (hitTestResults.length > 0) {
+                const hit = hitTestResults[0];
+
+                // Set the position of the model to the hit position
+                self.knight.object.position.setFromMatrixPosition(hit.getPose(self.referenceSpace).transform);
+                self.knight.object.visible = true;
+            }
+        }
+    }
+
+	this.controller = this.renderer.xr.getController(0);
         this.controller.addEventListener('select', onSelect);
 
         this.scene.add(this.controller);
