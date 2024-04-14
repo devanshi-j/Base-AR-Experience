@@ -243,140 +243,85 @@ loadKnight() {
         this.ui = ui;
     }
 
-setupXR() {
-        this.renderer.xr.enabled = true;
-
+setupXR(){
+        this.renderer.xr.enabled = true; 
         
         const self = this;
         let controller1, controller2;
-
-
-        function onSessionStart() {
-            self.ui.mesh.position.set(0, -0.15, -0.3);
-            self.camera.add(self.ui.mesh);
-
-            if (!isHitTestRequested) {
-                const session = self.renderer.xr.getSession();
-                session.requestReferenceSpace('viewer').then(function (refSpace) {
-                  referenceSpace = refSpace;
-                  session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
-                    hitTestSource = source;
-                    isHitTestRequested = true;
-                  });
-                });
-              }
+        
+        function onSessionStart(){
+            self.ui.mesh.position.set( 0, -0.15, -0.3 );
+            self.camera.add( self.ui.mesh );
         }
-
-        function onSessionEnd() {
-            self.camera.remove(self.ui.mesh);
-            if (hitTestSource) {
-                hitTestSource.cancel();
-                hitTestSource = null;
-              }
-              referenceSpace = null;
-              isHitTestRequested = false;
+        
+        function onSessionEnd(){
+            self.camera.remove( self.ui.mesh );
         }
-
-        const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd });
-
-        //this.scene.add(this.controller);
-
-	/*if (this.controller instanceof THREE.Object3D) {
-        this.scene.add(this.controller);
-        } else {
-        console.error('Error: this.controller is not an instance of THREE.Object3D');
-        // Handle the error appropriately
-        }*/
-
-
-        this.gestures = new ControllerGestures(this.renderer);
-        this.gestures.addEventListener('tap', (ev) => {
-            self.ui.updateElement('info', 'tap');
-            if (!self.knight.object.visible) {
+        
+        const btn = new ARButton( this.renderer, { onSessionStart, onSessionEnd });//, sessionInit: { optionalFeatures: [ 'dom-overlay' ], domOverlay: { root: document.body } } } );
+        
+        this.gestures = new ControllerGestures( this.renderer );
+        this.gestures.addEventListener( 'tap', (ev)=>{
+            //console.log( 'tap' ); 
+            self.ui.updateElement('info', 'tap' );
+            if (!self.knight.object.visible){
                 self.knight.object.visible = true;
-                self.knight.object.position.set(0, -0.3, -0.5).add(ev.position);
-                self.scene.add(self.knight.object);
+                self.knight.object.position.set( 0, -0.3, -0.5 ).add( ev.position );
+                self.scene.add( self.knight.object ); 
             }
-
         });
-
-        this.gestures.addEventListener('doubletap', (ev) => {
-            self.ui.updateElement('info', 'doubletap');
+        this.gestures.addEventListener( 'doubletap', (ev)=>{
+            //console.log( 'doubletap'); 
+            self.ui.updateElement('info', 'doubletap' );
         });
-        /*this.gestures.addEventListener('press', (ev) => {
+        this.gestures.addEventListener( 'press', (ev)=>{
+            //console.log( 'press' );  
             if (ev.hand && !isDragging) {
                 isDragging = true;
                 dragStartPosition = self.knight.object.position.clone();
-            }
-            self.ui.updateElement('info', 'press');
+              }  
+            self.ui.updateElement('info', 'press' );
         });
         this.gestures.addEventListener('pressup', (ev) => {
             isDragging = false;
-        });*/
+          });
 
-        this.gestures.addEventListener('move', (ev) => {
-        if (self.knight && !isDragging) {
-            // Smoothly move the model based on user input
-            const delta = ev.position.clone().sub(self.startPosition);
-            self.knight.object.position.add(delta);
-        }
+          this.gestures.addEventListener('move', (ev) => {
+            if (isDragging) {
+              const delta = ev.position.clone().sub(dragStartPosition);
+              self.knight.object.position.copy(dragStartPosition.add(delta));
+            }
+          });
 
-
-	this.gestures.addEventListener('press', (ev) => {
-        if (ev.hand && !isDragging) {
-            isDragging = true;
-            self.startPosition = self.knight.object.position.clone();
-        }
-    });
-
-    this.gestures.addEventListener('pressup', (ev) => {
-        isDragging = false;
-    });
-    });
-
-        this.gestures.addEventListener('pan', (ev) => {
-            if (ev.initialise !== undefined) {
+        this.gestures.addEventListener( 'pan', (ev)=>{
+            //console.log( ev );
+            if (ev.initialise !== undefined){
                 self.startPosition = self.knight.object.position.clone();
-            } else {
-                const pos = self.startPosition.clone().add(ev.delta.multiplyScalar(3));
-                self.knight.object.position.copy(pos);
-                self.ui.updateElement('info', `pan x:${ev.delta.x.toFixed(3)}, y:${ev.delta.y.toFixed(3)}, x:${ev.delta.z.toFixed(3)}`);
-            }
+            }else{
+                const pos = self.startPosition.clone().add( ev.delta.multiplyScalar(3) );
+                self.knight.object.position.copy( pos );
+                self.ui.updateElement('info', `pan x:${ev.delta.x.toFixed(3)}, y:${ev.delta.y.toFixed(3)}, x:${ev.delta.z.toFixed(3)}` );
+            } 
         });
-        this.gestures.addEventListener('swipe', (ev) => {
-            self.ui.updateElement('info', `swipe ${ev.direction}`);
-            if (self.knight.object.visible) {
+        this.gestures.addEventListener( 'swipe', (ev)=>{
+            //console.log( ev );   
+            self.ui.updateElement('info', `swipe ${ev.direction}` );
+            if (self.knight.object.visible){
                 self.knight.object.visible = false;
-                self.scene.remove(self.knight.object);
+                self.scene.remove( self.knight.object ); 
             }
         });
-        this.gestures.addEventListener('pinch', (ev) => {
-            if (ev.initialise !== undefined) {
+        this.gestures.addEventListener( 'pinch', (ev)=>{
+            //console.log( ev );  
+            if (ev.initialise !== undefined){
                 self.startScale = self.knight.object.scale.clone();
-            } else {
+            }else{
                 const scale = self.startScale.clone().multiplyScalar(ev.scale);
-                self.knight.object.scale.copy(scale);
-                self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}`);
+                self.knight.object.scale.copy( scale );
+                self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}` );
             }
         });
-        
-        // ...inside the 'rotate' event listener
-        /*if (ev.initialise !== undefined) {
-        self.startQuaternion = self.knight.object.quaternion.clone();
-        } else {
-        // Construct the rotation quaternion directly
-        const rotationQuaternion = new THREE.Quaternion
-        .setFromAxisAngle(new THREE.Vector3(ev.axis), ev.theta);
-         self.knight.object.quaternion.multiply(rotationQuaternion);
-         // Update reticle position
-         self.reticle.matrixWorldNeedsUpdate = true;
-        // Optionally, consider adjusting reticle orientation based on rotation
-        self.knight.object.quaternion.copy( self.startQuaternion );
-        self.knight.object.rotateY( ev.theta );
-        self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`
-        )};*/
-
-	 this.gestures.addEventListener( 'rotate', (ev)=>{
+        this.gestures.addEventListener( 'rotate', (ev)=>{
             //      sconsole.log( ev ); 
             if (ev.initialise !== undefined){
                 self.startQuaternion = self.knight.object.quaternion.clone();
@@ -386,105 +331,26 @@ setupXR() {
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`  );
             }
         });
-
-        this.renderer.setAnimationLoop(this.render.bind(this));
-     
-      // Add hit test functionality
-        this.hitTestSourceRequested = false;
-        this.hitTestSource = null;
-
-        /*function onSelect() {
-            if (self.knight === undefined) return;
-
-            if (self.reticle.visible) {
-                if (self.knight.object.visible) {
-                    self.knight.object.position.setFromMatrixPosition(self.reticle.matrix);
-                    self.knight.object.visible = true;
-                } else {
-                    self.knight.object.position.setFromMatrixPosition(self.reticle.matrix);
-                    self.knight.object.visible = true;
-                }
-            }
-        }
-
-        this.controller = this.renderer.xr.getController(0);
-        this.controller.addEventListener('select', onSelect);*/
-
-	 function onSelect(event) {
-        if (self.knight === undefined) return;
-
-        const controller = event.target;
-        const session = self.renderer.xr.getSession();
-
-        if (self.reticle.visible && session) {
-            const hitTestResults = session.requestHitTest(controller.inputSource, self.reticle);
-
-            if (hitTestResults.length > 0) {
-                const hit = hitTestResults[0];
-
-                // Set the position of the model to the hit position
-                self.knight.object.position.setFromMatrixPosition(hit.getPose(self.referenceSpace).transform);
-                self.knight.object.visible = true;
-            }
-        }
-    }
-
-	this.controller = this.renderer.xr.getController(0);
-        this.controller.addEventListener('select', onSelect);
-
-        this.scene.add(this.controller);
-
+        
         this.renderer.setAnimationLoop(this.render.bind(this));
     }
-
-    requestHitTestSource() {
-        const self = this;
-
-        const session = this.renderer.xr.getSession();
-
-        session.requestReferenceSpace('viewer').then(function (referenceSpace) {
-
-            session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
-
-                self.hitTestSource = source;
-
-            });
-
-        });
-
-        session.addEventListener('end', function () {
-
-            self.hitTestSourceRequested = false;
-            self.hitTestSource = null;
-            self.referenceSpace = null;
-
-        });
-
-        this.hitTestSourceRequested = true;
-
-    }
-
-   
-
-    render(timestamp, frame) {
-        const dt = this.clock.getDelta();
-        if (this.knight) this.knight.update(dt);
-
-        const self = this;
-
-        if (frame) {
-
-            if (this.hitTestSourceRequested === false) this.requestHitTestSource()
-
-            if (this.hitTestSource) this.getHitTestResults(frame);
-
-        }
     
-        this.renderer.render(this.scene, this.camera);
+    resize(){
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize( window.innerWidth, window.innerHeight );  
     }
-
-}
-
+    
+	render( ) {   
+        const dt = this.clock.getDelta();
+        this.stats.update();
+        if ( this.renderer.xr.isPresenting ){
+            this.gestures.update();
+            this.ui.update();
+        }
+        if ( this.knight !== undefined ) this.knight.update(dt);
+        this.renderer.render( this.scene, this.camera );
+    }
 
 
 export { App };
