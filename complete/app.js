@@ -261,6 +261,8 @@ setupXR(){
         const btn = new ARButton( this.renderer, { onSessionStart, onSessionEnd });//, sessionInit: { optionalFeatures: [ 'dom-overlay' ], domOverlay: { root: document.body } } } );
         
         this.gestures = new ControllerGestures( this.renderer );
+        
+	
         this.gestures.addEventListener( 'tap', (ev)=>{
             //console.log( 'tap' ); 
             self.ui.updateElement('info', 'tap' );
@@ -286,12 +288,12 @@ setupXR(){
             isDragging = false;
           });
 
-          this.gestures.addEventListener('move', (ev) => {
-            if (isDragging) {
-              const delta = ev.position.clone().sub(dragStartPosition);
-              self.knight.object.position.copy(dragStartPosition.add(delta));
-            }
-          });
+          
+         this.gestures.addEventListener('move', (ev) => {
+      if (this.isDragging) {
+        const delta = ev.position.clone().sub(this.dragStartPosition);
+        this.knight.object.position.copy(this.dragStartPosition.add(delta));
+      }
 
         this.gestures.addEventListener( 'pan', (ev)=>{
             //console.log( ev );
