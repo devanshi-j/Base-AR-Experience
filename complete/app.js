@@ -176,7 +176,8 @@ class App {
 
     setupXR() {
         this.renderer.xr.enabled = true;
-    
+        const sessionPromise = this.renderer.xr.getSession();
+        
         const self = this;
     
         function onSessionStart() {
