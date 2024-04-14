@@ -176,7 +176,7 @@ class App {
 
     setupXR() {
         this.renderer.xr.enabled = true;
-        const sessionPromise = this.renderer.xr.getSession();
+       
         
         const self = this;
     
@@ -263,7 +263,7 @@ class App {
             }
         });
     
-        const sessionPromise = this.renderer.xr.getSession();
+    const sessionPromise = this.renderer.xr.getSession();
     if (sessionPromise) {
         sessionPromise.then(session => {
             session.requestReferenceSpace('viewer').then(referenceSpace => {
