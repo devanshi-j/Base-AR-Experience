@@ -263,24 +263,30 @@ class App {
         });
     
         const sessionPromise = this.renderer.xr.getSession();
-        sessionPromise.this(session => {
-            session.requestReferenceSpace('viewer').this(referenceSpace => {
-                session.requestHitTestSource({ space: referenceSpace }).this(source => {
-                    this.hitTestSource = source;
-                    this.hitTestSourceRequested = true;
-    
+    if (sessionPromise) {
+        sessionPromise.then(session => {
+            session.requestReferenceSpace('viewer').then(referenceSpace => {
+                session.requestHitTestSource({ space: referenceSpace }).then(source => {
+                    self.hitTestSource = source;
+                    self.hitTestSourceRequested = true;
+
                     session.addEventListener('end', () => {
-                        this.hitTestSourceRequested = false;
-                        this.hitTestSource = null;
+                        self.hitTestSourceRequested = false;
+                        self.hitTestSource = null;
                     });
+                }).catch(error => {
+                    console.error('Error setting up hit-test source:', error);
                 });
+            }).catch(error => {
+                console.error('Error requesting reference space:', error);
             });
         }).catch(error => {
             console.error('Error setting up XR:', error);
         });
-    
-        this.requestHitTestSource();
+    } else {
+        console.error('Failed to get XR session promise.');
     }
+}
     
     requestHitTestSource() {
         const self = this;
