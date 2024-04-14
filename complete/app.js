@@ -263,9 +263,9 @@ class App {
         });
     
         const sessionPromise = this.renderer.xr.getSession();
-        sessionPromise.then(session => {
-            session.requestReferenceSpace('viewer').then(referenceSpace => {
-                session.requestHitTestSource({ space: referenceSpace }).then(source => {
+        sessionPromise.this(session => {
+            session.requestReferenceSpace('viewer').this(referenceSpace => {
+                session.requestHitTestSource({ space: referenceSpace }).this(source => {
                     this.hitTestSource = source;
                     this.hitTestSourceRequested = true;
     
