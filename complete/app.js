@@ -132,6 +132,23 @@ class App {
 		);
 	}*/
 
+
+function onSelect() {
+    if (self.knight === undefined) return;
+
+    if (self.reticle.visible) {
+        if (self.knight.object.visible) {
+            // Move the knight object to the position of the reticle
+            self.knight.object.position.copy(self.reticle.position);
+        } else {
+            // Make the knight object visible and move it to the position of the reticle
+            self.knight.object.position.copy(self.reticle.position);
+            self.scene.add(self.knight.object);
+        }
+    }
+}
+
+
      // Inside the loadKnight function:
 loadKnight() {
     const loader = new GLTFLoader().setPath(this.assetsPath);
@@ -183,21 +200,6 @@ loadKnight() {
     );
 }
 
-// Inside the onSelect function (for selecting with controller):
-function onSelect() {
-    if (self.knight === undefined) return;
-
-    if (self.reticle.visible) {
-        if (self.knight.object.visible) {
-            // Move the knight object to the position of the reticle
-            self.knight.object.position.copy(self.reticle.position);
-        } else {
-            // Make the knight object visible and move it to the position of the reticle
-            self.knight.object.position.copy(self.reticle.position);
-            self.scene.add(self.knight.object);
-        }
-    }
-}
 
     
     initScene(){
