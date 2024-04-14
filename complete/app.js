@@ -351,6 +351,8 @@ setupXR(){
         if ( this.knight !== undefined ) this.knight.update(dt);
         this.renderer.render( this.scene, this.camera );
     }
+}
+
 
 
 export { App };
