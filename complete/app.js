@@ -303,6 +303,7 @@ setupXR(){
         const delta = ev.position.clone().sub(this.dragStartPosition);
         this.knight.object.position.copy(this.dragStartPosition.add(delta));
       }
+    });
 
         this.gestures.addEventListener( 'pan', (ev)=>{
             //console.log( ev );
@@ -360,101 +361,88 @@ setupXR(){
                 }
             }
         }
-	 }
-					
+
         this.controller = this.renderer.xr.getController( 0 );
         this.controller.addEventListener( 'select', onSelect );
         
         this.scene.add( this.controller );    
-    }
-}
+    } 
 
-    
-    requestHitTestSource(){
+    requestHitTestSource() {
         const self = this;
-        
+    
         const session = this.renderer.xr.getSession();
-
-        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
-            
-            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
-
+    
+        session.requestReferenceSpace('viewer').then(function (referenceSpace) {
+    
+            session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
+    
                 self.hitTestSource = source;
-
-            } );
-
-        } );
-    }
-
-        session.addEventListener( 'end', function () {
-
+    
+            });
+    
+        });
+    
+        session.addEventListener('end', function () {
+    
             self.hitTestSourceRequested = false;
             self.hitTestSource = null;
             self.referenceSpace = null;
-
-        } );
-    }
-
+    
+        });
+    
         this.hitTestSourceRequested = true;
-
     }
     
-    getHitTestResults( frame ){
-        const hitTestResults = frame.getHitTestResults( this.hitTestSource );
-
-        if ( hitTestResults.length ) {
-            
+    getHitTestResults(frame) {
+        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
+    
+        if (hitTestResults.length) {
+    
             const referenceSpace = this.renderer.xr.getReferenceSpace();
-            const hit = hitTestResults[ 0 ];
-            const pose = hit.getPose( referenceSpace );
-
+            const hit = hitTestResults[0];
+            const pose = hit.getPose(referenceSpace);
+    
             this.reticle.visible = true;
-            this.reticle.matrix.fromArray( pose.transform.matrix );
-
+            this.reticle.matrix.fromArray(pose.transform.matrix);
+    
         } else {
-
+    
             this.reticle.visible = false;
-
+    
         }
-
-    }
-        
+    
         this.renderer.setAnimationLoop(this.render.bind(this));
+    
     }
     
-    resize(){
+    resize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize( window.innerWidth, window.innerHeight );  
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
     
-	render( ) {   
+    render(timestamp, frame) {
         const dt = this.clock.getDelta();
-        this.stats.update();
-        if ( this.renderer.xr.isPresenting ){
-            this.gestures.update();
-            this.ui.update();
+        if (this.knight) {
+            this.knight.update(dt);
         }
-        if ( this.knight !== undefined ) this.knight.update(dt);
-        this.renderer.render( this.scene, this.camera );
-
-	 if (this.knight) this.knight.update(dt);
-
-        const self = this;
-        
-        if ( frame ) {
-
-            if ( this.hitTestSourceRequested === false ) this.requestHitTestSource( )
-
-            if ( this.hitTestSource ) this.getHitTestResults( frame );
-
+    
+        if (frame) {
+            if (this.hitTestSourceRequested === false) {
+                this.requestHitTestSource();
+            }
+    
+            if (this.hitTestSource) {
+                this.getHitTestResults(frame);
+            }
+        }
+    
+        this.renderer.render(this.scene, this.camera);
+    
+        /*if (this.knight.calculatedPath && this.knight.calculatedPath.length > 0) {
+            console.log(`path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
+        }*/
     }
-	
-}
-
-
-
+} 
 export { App };
-
-       
-        
