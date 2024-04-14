@@ -461,12 +461,13 @@ setupXR(){
         
         if (this.hitTestSource) 
             this.getHitTestResults(frame);
+	    this.renderer.render(this.scene, this.camera);
     }
 }
-	 this.renderer.render(this.scene, this.camera);
+	
 }
 // Ensure there are no duplicate render calls outside the function.
-
+// this.renderer.render(this.scene, this.camera);
 
    
         
