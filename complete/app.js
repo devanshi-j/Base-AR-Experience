@@ -173,10 +173,10 @@ class App{
                     self.scene.add(self.knight.object);
 
                     self.knight.action = 'Dance';
-				    const scale = 0.005;
-				    self.knight.object.scale.set(scale, scale, scale); 
+		    const scale = 0.005;
+		    self.knight.object.scale.set(scale, scale, scale); 
         
-                    self.loadingBar.visible = false;
+                    self.loadingBar.visible = true;
                 },
                 function(xhr) {
                     // Update loading progress
