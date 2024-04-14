@@ -133,7 +133,7 @@ class App {
 	}*/
 
 
-function onSelect() {
+onSelect() {
     if (self.knight === undefined) return;
 
     if (self.reticle.visible) {
