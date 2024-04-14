@@ -133,7 +133,7 @@ class App {
 	}*/
 
 
-onSelect() {
+/*onSelect() {
     if (self.knight === undefined) return;
 
     if (self.reticle.visible) {
@@ -146,7 +146,7 @@ onSelect() {
             self.scene.add(self.knight.object);
         }
     }
-}
+}*/
 
 
      // Inside the loadKnight function:
