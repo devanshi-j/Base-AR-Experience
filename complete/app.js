@@ -243,7 +243,7 @@ loadKnight() {
         this.ui = ui;
     }
 
-    setupXR() {
+setupXR() {
         this.renderer.xr.enabled = true;
 
         
@@ -365,7 +365,7 @@ loadKnight() {
         self.startQuaternion = self.knight.object.quaternion.clone();
         } else {
         // Construct the rotation quaternion directly
-        const rotationQuaternion = new THREE.Quaternion()
+        const rotationQuaternion = new THREE.Quaternion
         .setFromAxisAngle(new THREE.Vector3(ev.axis), ev.theta);
          self.knight.object.quaternion.multiply(rotationQuaternion);
          // Update reticle position
