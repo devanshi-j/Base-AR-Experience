@@ -342,6 +342,77 @@ setupXR(){
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`  );
             }
         });
+
+
+      this.hitTestSourceRequested = false;
+        this.hitTestSource = null;
+        
+        function onSelect() {
+            if (self.knight===undefined) return;
+            
+            if (self.reticle.visible){
+                if (self.knight.object.visible){
+                    self.workingVec3.setFromMatrixPosition( self.reticle.matrix );
+                    self.knight.newPath(self.workingVec3);
+                }else{
+                    self.knight.object.position.setFromMatrixPosition( self.reticle.matrix );
+                    self.knight.object.visible = true;
+                }
+            }
+        }
+
+        this.controller = this.renderer.xr.getController( 0 );
+        this.controller.addEventListener( 'select', onSelect );
+        
+        this.scene.add( this.controller );    
+    }
+    
+    requestHitTestSource(){
+        const self = this;
+        
+        const session = this.renderer.xr.getSession();
+
+        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
+            
+            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+
+                self.hitTestSource = source;
+
+            } );
+
+        } );
+
+        session.addEventListener( 'end', function () {
+
+            self.hitTestSourceRequested = false;
+            self.hitTestSource = null;
+            self.referenceSpace = null;
+
+        } );
+
+        this.hitTestSourceRequested = true;
+
+    }
+    
+    getHitTestResults( frame ){
+        const hitTestResults = frame.getHitTestResults( this.hitTestSource );
+
+        if ( hitTestResults.length ) {
+            
+            const referenceSpace = this.renderer.xr.getReferenceSpace();
+            const hit = hitTestResults[ 0 ];
+            const pose = hit.getPose( referenceSpace );
+
+            this.reticle.visible = true;
+            this.reticle.matrix.fromArray( pose.transform.matrix );
+
+        } else {
+
+            this.reticle.visible = false;
+
+        }
+
+    }
         
         this.renderer.setAnimationLoop(this.render.bind(this));
     }
@@ -361,7 +432,19 @@ setupXR(){
         }
         if ( this.knight !== undefined ) this.knight.update(dt);
         this.renderer.render( this.scene, this.camera );
+
+	 if (this.knight) this.knight.update(dt);
+
+        const self = this;
+        
+        if ( frame ) {
+
+            if ( this.hitTestSourceRequested === false ) this.requestHitTestSource( )
+
+            if ( this.hitTestSource ) this.getHitTestResults( frame );
+
     }
+	
 }
 
 
