@@ -441,29 +441,33 @@ setupXR(){
         /*if (this.knight.calculatedPath && this.knight.calculatedPath.length > 0) {
             console.log(`path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
         }*/
-    render( timestamp, frame ) {
-             const dt = this.clock.getDelta();
-             this.stats.update();
-        if ( this.renderer.xr.isPresenting ){
-            this.gestures.update();
-            this.ui.update();
-        }
-        if ( this.knight !== undefined ) this.knight.update(dt);
-        this.renderer.render( this.scene, this.camera );
+    render(timestamp, frame) {
+    const dt = this.clock.getDelta();
+    this.stats.update();
+    
+    if (this.renderer.xr.isPresenting) {
+        this.gestures.update();
+        this.ui.update();
     }
-    if (this.knight) this.knight.update(dt);
+    
+    if (this.knight !== undefined) 
+        this.knight.update(dt);
+    
+    this.renderer.render(this.scene, this.camera);
 
-        const self = this;
+    if (frame) {
+        if (this.hitTestSourceRequested === false) 
+            this.requestHitTestSource();
         
-        if ( frame ) {
-
-            if ( this.hitTestSourceRequested === false ) this.requestHitTestSource( )
-
-            if ( this.hitTestSource ) this.getHitTestResults( frame );
-	}
-        }
-       this.renderer.render(this.scene, this.camera);
+        if (this.hitTestSource) 
+            this.getHitTestResults(frame);
+    }
 }
+	 this.renderer.render(this.scene, this.camera);
+}
+// Ensure there are no duplicate render calls outside the function.
+
+
    
         
 export { App };
