@@ -150,60 +150,61 @@ class App {
 
 
      // Inside the loadKnight function:
-loadKnight() {
-    const loader = new GLTFLoader().setPath(this.assetsPath);
-    const self = this;
+loadKnight() { 
+          const loader = new GLTFLoader().setPath('../assets/');
+            const self = this;
+        
+            loader.load(
+                'knight2.glb',
+                function(gltf) {
+                    // Ensure the loaded model is accessible in the scene
+                    const object = gltf.scene.children[5];
+                    if (!object) {
+                        console.error('Error: No object found in the loaded model.');
+                        return;
+                    }
+        
+                    // Traverse the model to modify materials
+                    object.traverse(function(child) {
+                        if (child.isMesh) {
+                            child.material.metalness = 0;
+                            child.material.roughness = 1;
+                        }
+                    });
+        
+                    // Create a player object and set it up
+                    const options = {
+                        object: object,
+                        speed: 0.5,
+                        animations: gltf.animations,
+                        clip: gltf.animations[0],
+                        app: self,
+                        name: 'knight',
+                        npc: false
+                    };
+        
+                    self.knight = new Player(options);
+                    //self.knight.object.visible = true; // Ensure the model is visible
+                    self.knight.object.visible = false;
+                    self.scene.add(self.knight.object);
 
-    // Load a GLTF resource
-    loader.load(
-        // Resource URL
-        `knight2.glb`,
-        // Called when the resource is loaded
-        function (gltf) {
-            const object = gltf.scene.children[5];
-
-            const options = {
-                object: object,
-                speed: 0.5,
-                assetsPath: self.assetsPath,
-                loader: loader,
-                animations: gltf.animations,
-                clip: gltf.animations[0],
-                app: self,
-                name: 'knight',
-                npc: false
-            };
-
-            self.knight = new Player(options);
-
-            // Set the knight's object to be visible after creation
-            self.knight.object.visible = true;
-
-            self.knight.action = 'Dance';
-            const scale = 0.005;
-            self.knight.object.scale.set(scale, scale, scale);
-
-            // Initial position of the model (adjust as needed)
-           self.knight.object.position.set(0, 0, -5); // Example initial position
-
-            self.loadingBar.visible = false;
-            self.renderer.setAnimationLoop(self.render.bind(self));
-        },
-        // Called while loading is progressing
-        function (xhr) {
-            self.loadingBar.progress = xhr.loaded / xhr.total;
-        },
-        // Called when loading has errors
-        function (error) {
-            console.error('An error happened', error);
-        }
-    );
-}
-
-
+                    self.knight.action = 'Dance';
+		    const scale = 0.005;
+		    self.knight.object.scale.set(scale, scale, scale); 
+        
+                    self.loadingBar.visible = false;
+                },
+                function(xhr) {
+                    // Update loading progress
+                    self.loadingBar.progress = xhr.loaded / xhr.total;
+                },
+                function(error) {
+                    console.error('An error occurred while loading the model:', error);
+                }
+            );
+	}		
     
     initScene(){
-	
         this.reticle = new THREE.Mesh(
             new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
             new THREE.MeshBasicMaterial()
@@ -211,22 +212,17 @@ loadKnight() {
         
         this.reticle.matrixAutoUpdate = false;
         this.reticle.visible = false;
-        this.scene.add(this.reticle);
-
-	/*if (object instanceof THREE.Object3D) {
-    // Object is a valid THREE.Object3D instance, so add it to the scene
-     /*this.scene.add( this.reticle );
-     } else {
-    console.error('Error: Object is not an instance of THREE.Object3D', object);
-    // Handle the error as needed
-}*/
-
+        this.scene.add( this.reticle );
         
-    //this.loadKnight();
 
-	this.createUI();
+        this.isDragging = false;
+        this.dragStartPosition = new THREE.Vector3();
+       
+        this.loadKnight();
+        this.createUI();
+
     }
-    
+
    
     createUI() {
         const config = {
@@ -244,32 +240,98 @@ loadKnight() {
     }
 
 setupXR(){
-        this.renderer.xr.enabled = true; 
+	
+	this.renderer.xr.enabled = true;
+        
+        const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd, sessionInit: { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } } });
+
         
         const self = this;
-        let controller1, controller2;
-        
-        function onSessionStart(){
-            self.ui.mesh.position.set( 0, -0.15, -0.3 );
-            self.camera.add( self.ui.mesh );
-        }
-        
-        function onSessionEnd(){
-            self.camera.remove( self.ui.mesh );
-        }
-        
-       // const btn = new ARButton( this.renderer, { onSessionStart, onSessionEnd });//, sessionInit: { optionalFeatures: [ 'dom-overlay' ], domOverlay: { root: document.body } } } );
-        //const btn = new ARButton( this.renderer, { sessionInit: { requiredFeatures: [ 'hit-test' ], optionalFeatures: [ 'dom-overlay' ], domOverlay: { root: document.body } } } );
-        const btn = new ARButton(this.renderer, {
-         sessionInit: { requiredFeatures: ['hit-test'] },
-         optionalFeatures: ['dom-overlay'],
-         domOverlay: { root: document.body },
-         onSessionStart,
-         onSessionEnd,
-         });
+        let controller, controller1;
 
-	
-	this.gestures = new ControllerGestures( this.renderer );
+        this.hitTestSourceRequested = false;
+        this.hitTestSource = null;
+
+        function onSessionStart() {
+            self.ui.mesh.position.set(0, -0.15, -0.3);
+            self.camera.add(self.ui.mesh);
+          }
+      
+          function onSessionEnd() {
+            self.camera.remove(self.ui.mesh);
+          }
+
+       
+        
+        function onSelect() {
+            if (self.knight===undefined) return;
+            
+            if (self.reticle.visible){
+                if (self.knight.object.visible){
+                    self.workingVec3.setFromMatrixPosition( self.reticle.matrix );
+                    self.knight.newPath(self.workingVec3);
+                }else{
+                    self.knight.object.position.setFromMatrixPosition( self.reticle.matrix );
+                    self.knight.object.visible = true;
+                }
+            }
+        }
+
+        this.controller = this.renderer.xr.getController( 0 );
+        this.controller.addEventListener( 'select', onSelect );
+        
+        this.scene.add( this.controller );    
+    }
+    
+    requestHitTestSource(){
+        const self = this;
+        
+        const session = this.renderer.xr.getSession();
+
+        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
+            
+            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+
+                self.hitTestSource = source;
+
+            } );
+
+        } );
+
+        session.addEventListener( 'end', function () {
+
+            self.hitTestSourceRequested = false;
+            self.hitTestSource = null;
+            self.referenceSpace = null;
+
+        } );
+
+        this.hitTestSourceRequested = true;
+
+    }
+    
+    getHitTestResults( frame ){
+        const hitTestResults = frame.getHitTestResults( this.hitTestSource );
+
+        if ( hitTestResults.length ) {
+            
+            const referenceSpace = this.renderer.xr.getReferenceSpace();
+            const hit = hitTestResults[ 0 ];
+            const pose = hit.getPose( referenceSpace );
+
+            this.reticle.visible = true;
+            this.reticle.matrix.fromArray( pose.transform.matrix );
+
+        } else {
+
+            this.reticle.visible = false;
+
+        }
+
+        this.gestures = new ControllerGestures(this.renderer);
+
+        
+    
         this.gestures.addEventListener( 'tap', (ev)=>{
             //console.log( 'tap' ); 
             self.ui.updateElement('info', 'tap' );
@@ -284,34 +346,36 @@ setupXR(){
             self.ui.updateElement('info', 'doubletap' );
         });
         this.gestures.addEventListener( 'press', (ev)=>{
-            //console.log( 'press' );  
-            if (ev.hand && !isDragging) {
-                isDragging = true;
-                dragStartPosition = self.knight.object.position.clone();
-              }  
+            //console.log( 'press' );    
             self.ui.updateElement('info', 'press' );
         });
-        this.gestures.addEventListener('pressup', (ev) => {
-            isDragging = false;
+        this.gestures.addEventListener('press', (ev) => {
+            if (!self.knight.object.visible) return;
+      
+            self.isDragging = true;
+            self.dragStartPosition.copy(self.knight.object.position);
+            self.ui.updateElement('info', 'Drag started');
           });
 
-          this.gestures.addEventListener('move', (ev) => {
-            if (isDragging) {
-              const delta = ev.position.clone().sub(dragStartPosition);
-              self.knight.object.position.copy(dragStartPosition.add(delta));
+        
+          this.gestures.addEventListener('pan', (ev) => {
+            if (!self.isDragging) return;
+          
+            // Handle pan start (initial drag position)
+            if (ev.initialise !== undefined) {
+              self.startPosition = self.knight.object.position.clone();
+            } else {
+              // Calculate new position based on drag delta and sensitivity
+              const dragSensitivity = 3; // Adjust this value for desired movement speed
+              const delta = ev.delta.multiplyScalar(dragSensitivity);
+              const newPosition = self.startPosition.clone().add(delta);
+          
+              // Update model position and UI (optional)
+              self.knight.object.position.copy(newPosition);
+              self.ui.updateElement('info', `Dragging: x:${delta.x.toFixed(3)}, y:${delta.y.toFixed(3)}, z:${delta.z.toFixed(3)}`);
             }
           });
-
-        this.gestures.addEventListener( 'pan', (ev)=>{
-            //console.log( ev );
-            if (ev.initialise !== undefined){
-                self.startPosition = self.knight.object.position.clone();
-            }else{
-                const pos = self.startPosition.clone().add( ev.delta.multiplyScalar(3) );
-                self.knight.object.position.copy( pos );
-                self.ui.updateElement('info', `pan x:${ev.delta.x.toFixed(3)}, y:${ev.delta.y.toFixed(3)}, x:${ev.delta.z.toFixed(3)}` );
-            } 
-        });
+          
         this.gestures.addEventListener( 'swipe', (ev)=>{
             //console.log( ev );   
             self.ui.updateElement('info', `swipe ${ev.direction}` );
@@ -340,85 +404,12 @@ setupXR(){
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`  );
             }
         });
-        
 
-    
-      this.hitTestSourceRequested = false;
-        this.hitTestSource = null;
-        
-        function onSelect() {
-            if (self.knight===undefined) return;
-            
-            if (self.reticle.visible){
-                if (self.knight.object.visible){
-                    self.workingVec3.setFromMatrixPosition( self.reticle.matrix );
-                    self.knight.newPath(self.workingVec3);
-                }else{
-                    self.knight.object.position.setFromMatrixPosition( self.reticle.matrix );
-                    self.knight.object.visible = true;
-                }
-            }
-        }
+        this.renderer.setAnimationLoop( this.render.bind(this) );
 
-        this.controller = this.renderer.xr.getController( 0 );
-        this.controller.addEventListener( 'select', onSelect );
-        
-        this.scene.add( this.controller );    
-    } 
-
-    requestHitTestSource() {
-        const self = this;
-    
-        const session = this.renderer.xr.getSession();
-    
-        session.requestReferenceSpace('viewer').then(function (referenceSpace) {
-    
-            session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
-    
-                self.hitTestSource = source;
-    
-            });
-    
-        });
-    
-        session.addEventListener('end', function () {
-    
-            self.hitTestSourceRequested = false;
-            self.hitTestSource = null;
-            self.referenceSpace = null;
-    
-        });
-    
-        this.hitTestSourceRequested = true;
     }
     
-    getHitTestResults(frame) {
-        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-    
-        if (hitTestResults.length) {
-    
-            const referenceSpace = this.renderer.xr.getReferenceSpace();
-            const hit = hitTestResults[0];
-            const pose = hit.getPose(referenceSpace);
-    
-            this.reticle.visible = true;
-            this.reticle.matrix.fromArray(pose.transform.matrix);
-    
-        } else {
-    
-            this.reticle.visible = false;
-    
-        }
-    
-        this.renderer.setAnimationLoop(this.render.bind(this));
-    
-    }
-    
-    resize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+   
     
     /*render(timestamp, frame) {
         const dt = this.clock.getDelta();
