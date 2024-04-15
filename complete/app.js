@@ -162,7 +162,8 @@ loadKnight() {
                         console.error('Error: No object found in the loaded model.');
                         return;
                     }
-        
+
+			 self.knight.object.visible = true;
                     // Traverse the model to modify materials
                     object.traverse(function(child) {
                         if (child.isMesh) {
@@ -184,7 +185,7 @@ loadKnight() {
         
                     self.knight = new Player(options);
                     //self.knight.object.visible = true; // Ensure the model is visible
-                    self.knight.object.visible = true;
+                   
                    
                     self.scene.add(self.knight.object);
                     self.knight.action = 'Dance';
