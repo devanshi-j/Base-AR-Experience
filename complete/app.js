@@ -18,8 +18,7 @@ class App {
 
         this.loadingBar = new LoadingBar();
 
-	this.assetsPath = '../assets/';
-
+	
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         this.camera.position.set(0, 0, 10);
 
