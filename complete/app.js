@@ -16,7 +16,7 @@ class App {
 
         this.clock = new THREE.Clock();
 
-        this.loadingBar = new LoadingBar();
+      
 
 	
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -149,60 +149,61 @@ class App {
 
 
      // Inside the loadKnight function:
-loadKnight() { 
-          const loader = new GLTFLoader().setPath('../assets/');
-            const self = this;
-        
-            loader.load(
-                'knight2.glb',
-                function(gltf) {
-                    // Ensure the loaded model is accessible in the scene
-                    const object = gltf.scene.children[5];
-                    if (!object) {
-                        console.error('Error: No object found in the loaded model.');
-                        return;
-                    }
+ loadKnight() {
+        this.loadingBar = new LoadingBar();
+        const loader = new GLTFLoader().setPath('../assets/');
+        const self = this;
 
-			 self.knight.object.visible = true;
-                    // Traverse the model to modify materials
-                    object.traverse(function(child) {
-                        if (child.isMesh) {
-                            child.material.metalness = 0;
-                            child.material.roughness = 1;
-                        }
-                    });
-        
-                    // Create a player object and set it up
-                    const options = {
-                        object: object,
-                        speed: 0.5,
-                        animations: gltf.animations,
-                        clip: gltf.animations[0],
-                        app: self,
-                        name: 'knight',
-                        npc: false
-                    };
-        
-                    self.knight = new Player(options);
-                    //self.knight.object.visible = true; // Ensure the model is visible
-                   
-                   
-                    self.scene.add(self.knight.object);
-                    self.knight.action = 'Dance';
-		    const scale = 0.005;
-		    self.knight.object.scale.set(scale, scale, scale); 
-        
-                    self.loadingBar.visible = false;
-                },
-                function(xhr) {
-                    // Update loading progress
-                    self.loadingBar.progress = xhr.loaded / xhr.total;
-                },
-                function(error) {
-                    console.error('An error occurred while loading the model:', error);
+        loader.load(
+            'knight2.glb',
+            function (gltf) {
+                // Ensure the loaded model is accessible in the scene
+                const object = gltf.scene.children[5];
+                if (!object) {
+                    console.error('Error: No object found in the loaded model.');
+                    return;
                 }
-            );
-	}		
+
+                // Traverse the model to modify materials
+                object.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material.metalness = 0;
+                        child.material.roughness = 1;
+                    }
+                });
+
+                // Create a player object and set it up
+                const options = {
+                    object: object,
+                    speed: 0.5,
+                    animations: gltf.animations,
+                    clip: gltf.animations[0],
+                    app: self,
+                    name: 'knight',
+                    npc: false
+                };
+
+                self.knight = new Player(options);
+                //self.knight.object.visible = true; // Ensure the model is visible
+                self.knight.object.visible = false;
+                self.scene.add(self.knight.object);
+
+                self.knight.action = 'Dance';
+                const scale = 0.005;
+                self.knight.object.scale.set(scale, scale, scale);
+
+                self.loadingBar.visible = false;
+            },
+            function (xhr) {
+                // Update loading progress
+                self.loadingBar.progress = xhr.loaded / xhr.total;
+            },
+            function (error) {
+                console.error('An error occurred while loading the model:', error);
+            }
+        );
+    }
+
     
     initScene(){
         this.reticle = new THREE.Mesh(
