@@ -141,7 +141,7 @@ class App {
         this.isDragging = false;
         this.dragStartPosition = new THREE.Vector3();
        
-        this.loadKnight();
+       
         this.createUI();
 
     }
