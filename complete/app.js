@@ -17,9 +17,9 @@ class App{
         
         this.clock = new THREE.Clock();
         
-        this.loadingBar = new LoadingBar();
+       
 
-	this.assetsPath = '../assets/';
+	
         
 	this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 	this.camera.position.set( 0, 1.6, 3 );
@@ -134,7 +134,9 @@ class App{
 			}
 		);*/
 
-           
+            this.loadingBar = new LoadingBar();
+
+	   
             const loader = new GLTFLoader().setPath('../assets/');
             const self = this;
         
@@ -176,7 +178,7 @@ class App{
 		    const scale = 0.005;
 		    self.knight.object.scale.set(scale, scale, scale); 
         
-                    self.loadingBar.visible = true;
+                    self.loadingBar.visible = false;
                 },
                 function(xhr) {
                     // Update loading progress
