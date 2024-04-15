@@ -184,9 +184,9 @@ loadKnight() {
         
                     self.knight = new Player(options);
                     //self.knight.object.visible = true; // Ensure the model is visible
-                    self.knight.object.visible = false;
+                    self.knight.object.visible = true;
+                   
                     self.scene.add(self.knight.object);
-
                     self.knight.action = 'Dance';
 		    const scale = 0.005;
 		    self.knight.object.scale.set(scale, scale, scale); 
