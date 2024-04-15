@@ -19,26 +19,26 @@ class App{
         
         this.loadingBar = new LoadingBar();
 
-		this.assetsPath = '../../assets/';
+	this.assetsPath = '../assets/';
         
-		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
-		this.camera.position.set( 0, 1.6, 3 );
+	this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
+	this.camera.position.set( 0, 1.6, 3 );
         
-		this.scene = new THREE.Scene();
+	this.scene = new THREE.Scene();
 
-		const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 2);
+	const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 2);
         ambient.position.set( 0.5, 1, 0.25 );
-		this.scene.add(ambient);
+	this.scene.add(ambient);
         
         const light = new THREE.DirectionalLight();
         light.position.set( 0.2, 1, 1);
         this.scene.add(light);
 			
-		this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true } );
-		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
-		this.renderer.outputEncoding = THREE.sRGBEncoding;
-		container.appendChild( this.renderer.domElement );
+	this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true } );
+	this.renderer.setPixelRatio( window.devicePixelRatio );
+	this.renderer.setSize( window.innerWidth, window.innerHeight );
+	this.renderer.outputEncoding = THREE.sRGBEncoding;
+	container.appendChild( this.renderer.domElement );
         this.setEnvironment();
         
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -56,7 +56,7 @@ class App{
         this.initScene();
         this.setupXR();
 		
-		this.renderer.setAnimationLoop(this.render.bind(this));
+	this.renderer.setAnimationLoop(this.render.bind(this));
 
          window.addEventListener('resize', this.resize.bind(this));
         
@@ -134,7 +134,7 @@ class App{
 			}
 		);*/
 
-            this.loadingBar = new LoadingBar();
+           
             const loader = new GLTFLoader().setPath('../assets/');
             const self = this;
         
