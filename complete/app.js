@@ -16,7 +16,7 @@ class App {
 
         this.clock = new THREE.Clock();
 
-	this.loadingBar = new THREE.LoadingBar();
+	
 	this.assetsPath = '../assets/';
 	
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -81,6 +81,8 @@ class App {
     }
 
      loadKnight() {
+
+	this.loadingBar = new LoadingBar();
         const loader = new GLTFLoader().setPath(this.assetsPath);
         const self = this;
 
