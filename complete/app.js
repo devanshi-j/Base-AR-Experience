@@ -151,11 +151,11 @@ class App {
      // Inside the loadKnight function:
  loadKnight() {
         this.loadingBar = new LoadingBar();
-        const loader = new GLTFLoader().setPath('../assets/');
+        const loader = new GLTFLoader().setPath('../assets');
         const self = this;
 
         loader.load(
-            'knight2.glb',
+            'ghoul.glb',
             function (gltf) {
                 // Ensure the loaded model is accessible in the scene
                 const object = gltf.scene.children[5];
