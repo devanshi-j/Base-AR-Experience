@@ -168,6 +168,9 @@ setupXR(){
         
         const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd, sessionInit: { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } } });
 
+	 this.controller = this.renderer.xr.getController(0);
+         this.controller.addEventListener('select', this.onSelect.bind(this));
+         this.scene.add(this.controller);
         
         const self = this;
         let controller, controller1;
@@ -206,32 +209,27 @@ setupXR(){
         this.scene.add( this.controller );    
     }
     
-    requestHitTestSource(){
-        const self = this;
-        
-        const session = this.renderer.xr.getSession();
+   
+requestHitTestSource() {
+    const self = this;
+    const session = this.renderer.xr.getSession();
 
-        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
-            
-            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+    session.requestReferenceSpace('viewer').then(function (referenceSpace) {
+        session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
+            self.hitTestSource = source;
+        });
+    });
 
-                self.hitTestSource = source;
+    session.addEventListener('end', function () {
+        self.hitTestSourceRequested = false;
+        self.hitTestSource = null;
+        self.referenceSpace = null;
+    });
 
-            } );
+    this.hitTestSourceRequested = true;
+} 
 
-        } );
-
-        session.addEventListener( 'end', function () {
-
-            self.hitTestSourceRequested = false;
-            self.hitTestSource = null;
-            self.referenceSpace = null;
-
-        } );
-
-        this.hitTestSourceRequested = true;
-
-    }
+    
     
     getHitTestResults( frame ){
         const hitTestResults = frame.getHitTestResults( this.hitTestSource );
@@ -241,6 +239,8 @@ setupXR(){
             const referenceSpace = this.renderer.xr.getReferenceSpace();
             const hit = hitTestResults[ 0 ];
             const pose = hit.getPose( referenceSpace );
+
+	   const hitTestResults = frame.getHitTestResults(this.hitTestSource);
 
             this.reticle.visible = true;
             this.reticle.matrix.fromArray( pose.transform.matrix );
@@ -252,9 +252,6 @@ setupXR(){
         }
 
         this.gestures = new ControllerGestures(this.renderer);
-
-        
-    
         this.gestures.addEventListener( 'tap', (ev)=>{
             //console.log( 'tap' ); 
             self.ui.updateElement('info', 'tap' );
@@ -355,27 +352,37 @@ setupXR(){
         /*if (this.knight.calculatedPath && this.knight.calculatedPath.length > 0) {
             console.log(`path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
         }*/
-    render(timestamp, frame) {
+    
+
+   render(timestamp, frame) {
     const dt = this.clock.getDelta();
     this.stats.update();
-    
+
+    // Ensure render loop continues even when XR is not presenting
+    if (!this.renderer.xr.isPresenting) {
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    // Check if XR session is present
+    if (frame) {
+        if (this.hitTestSourceRequested === false) {
+            this.requestHitTestSource();
+        }
+
+        if (this.hitTestSource) {
+            this.getHitTestResults(frame);
+        }
+    }
+
+    // Render UI
     if (this.renderer.xr.isPresenting) {
         this.gestures.update();
         this.ui.update();
     }
-    
-    if (this.knight !== undefined) 
-        this.knight.update(dt);
-    
-    this.renderer.render(this.scene, this.camera);
 
-    if (frame) {
-        if (this.hitTestSourceRequested === false) 
-            this.requestHitTestSource();
-        
-        if (this.hitTestSource) 
-            this.getHitTestResults(frame);
-	    this.renderer.render(this.scene, this.camera);
+    // Render scene objects (including knight)
+    if (this.knight !== undefined) {
+        this.knight.update(dt);
     }
 }
 	
