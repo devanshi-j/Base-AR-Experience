@@ -168,9 +168,9 @@ setupXR(){
         
         const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd, sessionInit: { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } } });
 
-	 this.controller = this.renderer.xr.getController(0);
+	 /*this.controller = this.renderer.xr.getController(0);
          this.controller.addEventListener('select', this.onSelect.bind(this));
-         this.scene.add(this.controller);
+         this.scene.add(this.controller);*/
         
         const self = this;
         let controller, controller1;
