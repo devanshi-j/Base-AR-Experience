@@ -16,8 +16,8 @@ class App {
 
         this.clock = new THREE.Clock();
 
-      
-
+	this.loadingBar = new THREE.LoadingBar();
+	this.assetsPath = '../assets/';
 	
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         this.camera.position.set(0, 0, 10);
@@ -80,6 +80,48 @@ class App {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+     loadKnight() {
+        const loader = new GLTFLoader().setPath(this.assetsPath);
+        const self = this;
+
+        loader.load(
+            `knight2.glb`,
+            function (gltf) {
+                const object = gltf.scene.children[5];
+
+                const options = {
+                    object: object,
+                    speed: 0.5,
+                    assetsPath: self.assetsPath,
+                    loader: loader,
+                    animations: gltf.animations,
+                    clip: gltf.animations[0],
+                    app: self,
+                    name: 'knight',
+                    npc: false
+                };
+
+                self.knight = new Player(options);
+
+                self.knight.object.visible = true;
+
+                self.knight.action = 'Dance';
+                const scale = 0.005;
+                self.knight.object.scale.set(scale, scale, scale);
+
+                self.knight.object.position.set(0, 0, -5);
+
+                self.loadingBar.visible = false;
+                self.renderer.setAnimationLoop(self.render.bind(self));
+            },
+            function (xhr) {
+                self.loadingBar.progress = xhr.loaded / xhr.total;
+            },
+            function (error) {
+                console.error('An error happened', error);
+            }
+        );
+    }
 	
     
     initScene(){
