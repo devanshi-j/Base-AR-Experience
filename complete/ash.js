@@ -217,6 +217,8 @@ setupHitTesting() {
  this.hitTestSourceRequested = false;
  this.hitTestSource = null;
 
+this.gestures.requestHitTestSource();
+
 
 requestHitTestSource() {
     const self = this;
@@ -240,18 +242,19 @@ requestHitTestSource() {
     
     
     getHitTestResults( frame ){
-        const hitTestResults = frame.getHitTestResults( this.hitTestSource );
 
-        if ( hitTestResults.length ) {
-            
-            const referenceSpace = this.renderer.xr.getReferenceSpace();
-            const hit = hitTestResults[ 0 ];
-            const pose = hit.getPose( referenceSpace );
+	const hitTestResults = this.gestures.getHitTestResults(frame); // Assuming this is intentional
 
-	   const hitTestResults = frame.getHitTestResults(this.hitTestSource);
+     if (hitTestResults.length) {
+    const referenceSpace = this.renderer.xr.getReferenceSpace();
+    const hit = hitTestResults[0];
+    const pose = hit.getPose(referenceSpace);
 
-            this.reticle.visible = true;
-            this.reticle.matrix.fromArray( pose.transform.matrix );
+    // Update reticle
+    this.reticle.visible = true;
+    this.reticle.matrix.fromArray(pose.transform.matrix);
+}
+
 
         } else {
 
