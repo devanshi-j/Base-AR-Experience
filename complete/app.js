@@ -19,7 +19,7 @@ class App{
 
        
 
-        this.assetsPath = '../assets/';
+
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         this.camera.position.set(0, 0, 10);
@@ -94,7 +94,7 @@ class App{
             this.loadingBar = new LoadingBar();
         
 	   
-            const loader = new GLTFLoader().setPath('this.assetsPath');
+            const loader = new GLTFLoader().setPath('../assests/');
             const self = this;
         
             loader.load(
@@ -198,7 +198,7 @@ class App{
 
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
-	this.onSelect = this.onSelect.bind(this);
+	
 
         function onSessionStart() {
             self.ui.mesh.position.set(0, -0.15, -0.3);
