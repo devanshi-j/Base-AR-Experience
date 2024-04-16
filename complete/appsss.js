@@ -17,11 +17,7 @@ class App{
         
         this.clock = new THREE.Clock();
         
-       
-
-	
-        
-	this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
+        this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 	this.camera.position.set( 0, 1.6, 3 );
         
 	this.scene = new THREE.Scene();
@@ -87,53 +83,7 @@ class App{
     }
     
     loadKnight(){
-	    //const loader = new GLTFLoader().setPath(this.assetsPath);
-		//const self = this;
-		
-		// Load a GLTF resource
-		/*loader.load(
-			// resource URL
-			`knight2.glb`,
-			// called when the resource is loaded
-			function ( gltf ) {
-				const object = gltf.scene.children[5];
-				
-				const options = {
-					object: object,
-					speed: 0.5,
-					assetsPath: self.assetsPath,
-					loader: loader,
-                    animations: gltf.animations,
-					clip: gltf.animations[0],
-					app: self,
-					name: 'knight',
-					npc: false
-				};
-				
-				self.knight = new Player(options);
-                self.knight.object.visible = false;
-				
-				self.knight.action = 'Dance';
-				const scale = 0.005;
-				self.knight.object.scale.set(scale, scale, scale); 
-				
-                self.loadingBar.visible = false;
-                self.renderer.setAnimationLoop( self.render.bind(self) );//(timestamp, frame) => { self.render(timestamp, frame); } );
-			},
-			// called while loading is progressing
-			function ( xhr ) {
-
-				self.loadingBar.progress = (xhr.loaded / xhr.total);
-
-			},
-			// called when loading has errors
-			function ( error ) {
-
-				console.log( 'An error happened' );
-
-			}
-		);*/
-
+	    
             this.loadingBar = new LoadingBar();
 
 	   
@@ -227,10 +177,14 @@ class App{
     
     
     setupXR(){
-        this.renderer.xr.enabled = true;
+	
+	this.renderer.xr.enabled = true;
         
         const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd, sessionInit: { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } } });
 
+	 /*this.controller = this.renderer.xr.getController(0);
+         this.controller.addEventListener('select', this.onSelect.bind(this));
+         this.scene.add(this.controller);*/
         
         const self = this;
         let controller, controller1;
@@ -269,32 +223,27 @@ class App{
         this.scene.add( this.controller );    
     }
     
-    requestHitTestSource(){
-        const self = this;
-        
-        const session = this.renderer.xr.getSession();
+   
+requestHitTestSource() {
+    const self = this;
+    const session = this.renderer.xr.getSession();
 
-        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
-            
-            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+    session.requestReferenceSpace('viewer').then(function (referenceSpace) {
+        session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
+            self.hitTestSource = source;
+        });
+    });
 
-                self.hitTestSource = source;
+    session.addEventListener('end', function () {
+        self.hitTestSourceRequested = false;
+        self.hitTestSource = null;
+        self.referenceSpace = null;
+    });
 
-            } );
+    this.hitTestSourceRequested = true;
+} 
 
-        } );
-
-        session.addEventListener( 'end', function () {
-
-            self.hitTestSourceRequested = false;
-            self.hitTestSource = null;
-            self.referenceSpace = null;
-
-        } );
-
-        this.hitTestSourceRequested = true;
-
-    }
+    
     
     getHitTestResults( frame ){
         const hitTestResults = frame.getHitTestResults( this.hitTestSource );
@@ -304,6 +253,8 @@ class App{
             const referenceSpace = this.renderer.xr.getReferenceSpace();
             const hit = hitTestResults[ 0 ];
             const pose = hit.getPose( referenceSpace );
+
+	   const hitTestResults = frame.getHitTestResults(this.hitTestSource);
 
             this.reticle.visible = true;
             this.reticle.matrix.fromArray( pose.transform.matrix );
@@ -315,9 +266,6 @@ class App{
         }
 
         this.gestures = new ControllerGestures(this.renderer);
-
-        
-    
         this.gestures.addEventListener( 'tap', (ev)=>{
             //console.log( 'tap' ); 
             self.ui.updateElement('info', 'tap' );
@@ -394,6 +342,7 @@ class App{
         this.renderer.setAnimationLoop( this.render.bind(this) );
 
     }
+    
 
     render( timestamp, frame ) {
         const dt = this.clock.getDelta();
