@@ -33,6 +33,9 @@ class ControllerGestures extends THREE.EventDispatcher {
 
         this.clock = clock;
 
+        this.hitTestSourceRequested = false;
+        this.hitTestSource = null;
+
         function onSelectStart() {
             const data = this.userData.gestures;
 
@@ -84,6 +87,30 @@ class ControllerGestures extends THREE.EventDispatcher {
         }
     }
 
+
+
+    requestHitTestSource(session) {
+        const self = this;
+
+        session.requestReferenceSpace('viewer').then(function(referenceSpace) {
+            session.requestHitTestSource({ space: referenceSpace }).then(function(source) {
+                self.hitTestSource = source;
+            });
+        });
+
+        session.addEventListener('end', function() {
+            self.hitTestSourceRequested = false;
+            self.hitTestSource = null;
+        });
+
+        this.hitTestSourceRequested = true;
+    }
+
+     getHitTestResults(frame) {
+        if (!frame || !this.hitTestSource) return [];
+
+        return frame.getHitTestResults(this.hitTestSource);
+    }
     handleRotation(axis, theta) {
         if (!this.knight || !this.knight.object) return;
 
