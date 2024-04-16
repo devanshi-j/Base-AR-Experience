@@ -50,7 +50,7 @@ class App {
         this.quaternion = new THREE.Quaternion();
 
         this.initScene();
-       
+       this.setupXR();
         this.loadKnight();
         window.addEventListener('resize', this.resize.bind(this));
     }
@@ -136,7 +136,7 @@ class App {
         this.dragStartPosition = new THREE.Vector3();
 
         this.createUI();
-        this.setupXR();
+        
     }
 
     createUI() {
@@ -179,32 +179,35 @@ class App {
     }
 
     onSessionStart() {
-        this.ui.mesh.position.set(0, -0.15, -0.3);
-        this.camera.add(this.ui.mesh);
-    }
+    console.log('XR session started');
+    this.ui.mesh.position.set(0, -0.15, -0.3);
+    this.camera.add(this.ui.mesh);
+}
 
-    onSessionEnd() {
-        this.camera.remove(this.ui.mesh);
-    }
+onSessionEnd() {
+    console.log('XR session ended');
+    this.camera.remove(this.ui.mesh);
+}
+
 
     onSelect() {
-        if (this.knight === undefined) return;
+    console.log('Controller select event triggered');
+    if (this.knight === undefined) return;
 
-        if (this.reticle.visible) {
-            if (this.knight.object.visible) {
-                this.workingVec3.setFromMatrixPosition(this.reticle.matrix);
-                this.knight.newPath(this.workingVec3);
-            } else {
-                this.knight.object.position.setFromMatrixPosition(this.reticle.matrix);
-                this.knight.object.visible = true;
-            }
+    if (this.reticle.visible) {
+        if (this.knight.object.visible) {
+            this.workingVec3.setFromMatrixPosition(this.reticle.matrix);
+            this.knight.newPath(this.workingVec3);
+        } else {
+            this.knight.object.position.setFromMatrixPosition(this.reticle.matrix);
+            this.knight.object.visible = true;
         }
     }
+}
 
     setupHitTesting() {
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
-
         this.requestHitTestSource();
     }
 
