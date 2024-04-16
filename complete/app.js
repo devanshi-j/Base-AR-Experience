@@ -17,7 +17,7 @@ class App{
 
         this.clock = new THREE.Clock();
 
-        this.loadingBar = new LoadingBar();
+       
 
         this.assetsPath = '../assets/';
 
@@ -92,7 +92,7 @@ class App{
     loadKnight(){
 	    
             this.loadingBar = new LoadingBar();
-
+        
 	   
             const loader = new GLTFLoader().setPath('this.assetsPath');
             const self = this;
