@@ -54,8 +54,8 @@ class App{
     initScene(){
         this.loadingBar = new LoadingBar();
         
-        this.assetsPath = '../assets/';
-        const loader = new GLTFLoader().setPath(this.assetsPath);
+       
+        const loader = new GLTFLoader().setPath('../assets/');
 		const self = this;
 		
 		// Load a GLTF resource
@@ -84,13 +84,14 @@ class App{
 				};
 				
 				self.knight = new Player(options);
-                self.knight.object.visible = false;
+                                self.knight.object.visible = false;
 				
 				self.knight.action = 'Dance';
 				const scale = 0.003;
 				self.knight.object.scale.set(scale, scale, scale); 
 				
-                self.loadingBar.visible = false;
+                                   self.scene.add(self.knight.object);
+				self.loadingBar.visible = false;
 			},
 			// called while loading is progressing
 			function ( xhr ) {
