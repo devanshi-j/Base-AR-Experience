@@ -242,26 +242,27 @@ requestHitTestSource() {
     
     
     getHitTestResults( frame ){
+const hitTestResults = this.gestures.getHitTestResults(frame);
+const hitTestResults2 = frame.getHitTestResults(this.hitTestSource);
 
-	const hitTestResults = this.gestures.getHitTestResults(frame); // Assuming this is intentional
-
-     if (hitTestResults.length) {
+if (hitTestResults1.length || hitTestResults2.length) {
     const referenceSpace = this.renderer.xr.getReferenceSpace();
-    const hit = hitTestResults[0];
-    const pose = hit.getPose(referenceSpace);
+    let pose;
 
-    // Update reticle
+    if (hitTestResults1.length) {
+        const hit = hitTestResults1[0];
+        pose = hit.getPose(referenceSpace);
+    } else {
+        const hit = hitTestResults2[0];
+        pose = hit.getPose(referenceSpace);
+    }
+
     this.reticle.visible = true;
     this.reticle.matrix.fromArray(pose.transform.matrix);
 }
-
-
-        } else {
-
-            this.reticle.visible = false;
-
-        }
-    }
+}
+}
+}
 }
 }
 setupControllerGestures() {
