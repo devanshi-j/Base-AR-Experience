@@ -55,7 +55,7 @@ class App{
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
 
-        this.onSelect = this.onSelect.bind(this);
+        
 
         this.controller = this.renderer.xr.getController(0);
         this.controller.addEventListener('select', this.onSelect);
@@ -198,6 +198,7 @@ class App{
 
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
+	this.onSelect = this.onSelect.bind(this);
 
         function onSessionStart() {
             self.ui.mesh.position.set(0, -0.15, -0.3);
@@ -220,6 +221,7 @@ class App{
                 }else{
                     self.knight.object.position.setFromMatrixPosition( self.reticle.matrix );
                     self.knight.object.visible = true;
+		   
                 }
             }
         }
