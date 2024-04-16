@@ -344,7 +344,7 @@ requestHitTestSource() {
     }
     
 
-    render( timestamp, frame ) {
+    /*render( timestamp, frame ) {
         const dt = this.clock.getDelta();
         this.stats.update();
         if (this.knight) this.knight.update(dt);
@@ -370,7 +370,26 @@ requestHitTestSource() {
 
         
 
+    }*/
+
+   render(timestamp, frame){
+    const dt = this.clock.getDelta();
+    this.stats.update();
+    if (this.renderer.xr.isPresenting) {
+        this.gestures.update();
+        this.ui.update();
     }
+    if (this.knight !== undefined) this.knight.update(dt);
+    this.renderer.render(this.scene, this.camera);
+
+    if (frame) {
+        if (this.hitTestSourceRequested === false) this.requestHitTestSource();
+
+        if (this.hitTestSource) this.getHitTestResults(frame);
+    }
+}
+}
+
 
  
 export { App };
