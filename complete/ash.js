@@ -176,7 +176,7 @@ class App {
         // Separate functions for hit-testing and controller-gestures
         this.setupHitTesting();
         this.setupControllerGestures();
-    }
+    
 
     onSessionStart() {
     console.log('XR session started');
@@ -328,6 +328,7 @@ onSessionEnd() {
         });
 
           this.renderer.setAnimationLoop(this.render.bind(this));
+    }
     }
 
    /*render(timestamp, frame) {
