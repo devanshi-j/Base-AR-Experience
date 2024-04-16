@@ -12,74 +12,81 @@ import { RGBELoader } from '../libs/three/jsm/RGBELoader.js';
 
 class App{
 	constructor(){
-		const container = document.createElement( 'div' );
-		document.body.appendChild( container );
-        
-        this.clock = new THREE.Clock();
-        
-        this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
-	this.camera.position.set( 0, 1.6, 3 );
-        
-	this.scene = new THREE.Scene();
+	 const container = document.createElement('div');
+        document.body.appendChild(container);
 
-	const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 2);
-        ambient.position.set( 0.5, 1, 0.25 );
-	this.scene.add(ambient);
-        
+        this.clock = new THREE.Clock();
+
+        this.loadingBar = new LoadingBar();
+
+        this.assetsPath = '../assets/';
+
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        this.camera.position.set(0, 0, 10);
+
+        this.scene = new THREE.Scene();
+
+        const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 2);
+        ambient.position.set(0.5, 1, 0.25);
+        this.scene.add(ambient);
+
         const light = new THREE.DirectionalLight();
-        light.position.set( 0.2, 1, 1);
+        light.position.set(0.2, 1, 1);
         this.scene.add(light);
-			
-	this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true } );
-	this.renderer.setPixelRatio( window.devicePixelRatio );
-	this.renderer.setSize( window.innerWidth, window.innerHeight );
-	this.renderer.outputEncoding = THREE.sRGBEncoding;
-	container.appendChild( this.renderer.domElement );
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        container.appendChild(this.renderer.domElement);
         this.setEnvironment();
-        
+
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.target.set(0, 3.5, 0);
         this.controls.update();
-    
+
         this.stats = new Stats();
         document.body.appendChild(this.stats.dom);
-    
+
         this.origin = new THREE.Vector3();
         this.euler = new THREE.Euler();
         this.quaternion = new THREE.Quaternion();
-        this.workingVec3 = new THREE.Vector3();
-        
+
+        this.hitTestSourceRequested = false;
+        this.hitTestSource = null;
+
+        this.onSelect = this.onSelect.bind(this);
+
+        this.controller = this.renderer.xr.getController(0);
+        this.controller.addEventListener('select', this.onSelect);
+        this.scene.add(this.controller);
+
         this.initScene();
         this.setupXR();
-		
-	this.renderer.setAnimationLoop(this.render.bind(this));
-
-         window.addEventListener('resize', this.resize.bind(this));
-        
-	}
-    
-    setEnvironment(){
-        const loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
-        const pmremGenerator = new THREE.PMREMGenerator( this.renderer );
-        pmremGenerator.compileEquirectangularShader();
-        
-        const self = this;
-        
-        loader.load( '../assets/hdr/venice_sunset_1k.hdr', ( texture ) => {
-          const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-          pmremGenerator.dispose();
-
-          self.scene.environment = envMap;
-
-        }, undefined, (err)=>{
-            console.error( 'An error occurred setting the environment');
-        } );
+        this.loadKnight();
+        window.addEventListener('resize', this.resize.bind(this));
     }
-	
-    resize(){ 
+
+    setEnvironment() {
+        const loader = new RGBELoader().setDataType(THREE.UnsignedByteType);
+        const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+        pmremGenerator.compileEquirectangularShader();
+
+        const self = this;
+
+        loader.load('../assets/hdr/venice_sunset_1k.hdr', (texture) => {
+            const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+            pmremGenerator.dispose();
+            self.scene.environment = envMap;
+        }, undefined, (err) => {
+            console.error('An error occurred setting the environment');
+        });
+    }
+
+    resize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
-    	this.camera.updateProjectionMatrix();
-    	this.renderer.setSize( window.innerWidth, window.innerHeight );  
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
     
     loadKnight(){
@@ -87,7 +94,7 @@ class App{
             this.loadingBar = new LoadingBar();
 
 	   
-            const loader = new GLTFLoader().setPath('../assets/');
+            const loader = new GLTFLoader().setPath('this.assetsPath');
             const self = this;
         
             loader.load(
