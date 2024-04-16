@@ -163,33 +163,38 @@ class App {
     }
 
 setupXR(){
-	
-	this.renderer.xr.enabled = true;
-        
-        const btn = new ARButton(this.renderer, { onSessionStart, onSessionEnd, sessionInit: { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } } });
+ this.renderer.xr.enabled = true;
+    
+    // Initialize XR button
+    const btn = new ARButton(this.renderer, {
+        onSessionStart: this.onSessionStart.bind(this),
+        onSessionEnd: this.onSessionEnd.bind(this),
+        sessionInit: {
+            requiredFeatures: ['hit-test'],
+            optionalFeatures: ['dom-overlay'],
+            domOverlay: { root: document.body }
+        }
+    });
 
-	 /*this.controller = this.renderer.xr.getController(0);
-         this.controller.addEventListener('select', this.onSelect.bind(this));
-         this.scene.add(this.controller);*/
-        
-        const self = this;
-        let controller, controller1;
+    // Set up controller and event listener
+    this.controller = this.renderer.xr.getController(0);
+    this.controller.addEventListener('select', this.onSelect.bind(this));
+    this.scene.add(this.controller);
 
-        this.hitTestSourceRequested = false;
-        this.hitTestSource = null;
+    // Separate functions for hit-testing and controller-gestures
+    this.setupHitTesting();
+    this.setupControllerGestures();
 
-        function onSessionStart() {
-            self.ui.mesh.position.set(0, -0.15, -0.3);
-            self.camera.add(self.ui.mesh);
-          }
-      
-          function onSessionEnd() {
-            self.camera.remove(self.ui.mesh);
-          }
+     function onSessionStart() {
+        self.ui.mesh.position.set(0, -0.15, -0.3);
+        self.camera.add(self.ui.mesh);
+    }
 
-       
-        
-        function onSelect() {
+    function onSessionEnd() {
+        self.camera.remove(self.ui.mesh);
+    }
+
+ function onSelect() {
             if (self.knight===undefined) return;
             
             if (self.reticle.visible){
@@ -203,13 +208,16 @@ setupXR(){
             }
         }
 
-        this.controller = this.renderer.xr.getController( 0 );
-        this.controller.addEventListener( 'select', onSelect );
-        
-        this.scene.add( this.controller );    
-    }
-    
-   
+}
+
+            
+setupHitTesting() {
+
+ const self = this;
+ this.hitTestSourceRequested = false;
+ this.hitTestSource = null;
+
+
 requestHitTestSource() {
     const self = this;
     const session = this.renderer.xr.getSession();
@@ -250,6 +258,11 @@ requestHitTestSource() {
             this.reticle.visible = false;
 
         }
+    }
+}
+}
+setupControllerGestures() {
+    const self = this;
 
         this.gestures = new ControllerGestures(this.renderer);
         this.gestures.addEventListener( 'tap', (ev)=>{
@@ -324,6 +337,9 @@ requestHitTestSource() {
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`  );
             }
         });
+
+}
+
 
         this.renderer.setAnimationLoop( this.render.bind(this) );
 
