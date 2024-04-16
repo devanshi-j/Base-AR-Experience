@@ -50,7 +50,7 @@ class App {
         this.quaternion = new THREE.Quaternion();
 
         this.initScene();
-        this.setupXR();
+       
         this.loadKnight();
         window.addEventListener('resize', this.resize.bind(this));
     }
@@ -136,6 +136,7 @@ class App {
         this.dragStartPosition = new THREE.Vector3();
 
         this.createUI();
+        this.setupXR();
     }
 
     createUI() {
@@ -314,7 +315,7 @@ class App {
         });
     }
 
-    render(timestamp, frame) {
+   /*render(timestamp, frame) {
         const dt = this.clock.getDelta();
         this.stats.update();
 
@@ -338,7 +339,40 @@ class App {
                 this.getHitTestResults(frame);
             }
         }
+    }*/
+     render(timestamp, frame) {
+    const dt = this.clock.getDelta();
+    this.stats.update();
+
+    if (this.renderer.xr.isPresenting) {
+        this.gestures.update(); // Update controller gestures (assuming gestures object exists)
+      this.ui.update(); // Update UI element (assuming ui object exists)
     }
-}
+
+    if (this.knight !== undefined) {
+      this.knight.update(dt); // Update knight animation (if it exists)
+    }
+
+    // Try-catch block for error handling during rendering
+    try {
+      this.renderer.render(this.scene, this.camera);
+    } catch (error) {
+      console.error("Error during rendering:", error);
+      // Handle the error gracefully (e.g., display an error message)
+    }
+
+    if (frame) {
+      if (this.hitTestSourceRequested === false) {
+        this.requestHitTestSource();
+      }
+
+      if (this.hitTestSource) {
+        this.getHitTestResults(frame);
+      }
+    }
+  }
+
+
+  
 
 export { App };
