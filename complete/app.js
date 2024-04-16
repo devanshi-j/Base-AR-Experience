@@ -206,10 +206,18 @@ onSessionEnd() {
 }
 
     setupHitTesting() {
-        this.hitTestSourceRequested = false;
-        this.hitTestSource = null;
+    this.hitTestSourceRequested = false;
+    this.hitTestSource = null;
+
+    // Check if the XR session is active
+    const session = this.renderer.xr.getSession();
+    if (session !== null) {
         this.requestHitTestSource();
+    } else {
+        console.warn('XR session is not active. Hit-testing cannot be initialized.');
     }
+}
+
 
     requestHitTestSource() {
         const self = this;
