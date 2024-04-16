@@ -251,6 +251,8 @@ onSessionEnd() {
         } else {
             this.reticle.visible = false;
         }
+
+          this.renderer.setAnimationLoop(this.render.bind(this));
     }
 
     setupControllerGestures() {
@@ -324,6 +326,8 @@ onSessionEnd() {
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
             }
         });
+
+          this.renderer.setAnimationLoop(this.render.bind(this));
     }
 
    /*render(timestamp, frame) {
