@@ -211,7 +211,7 @@ class App {
       
     
   
-        setupHitTesting = () => {
+        /*setupHitTesting = () => {
             this.hitTestSourceRequested = false;
             this.hitTestSource = null;
           
@@ -255,7 +255,7 @@ class App {
               }
             }
         
-          };
+          };*/
           
 
     setupControllerGestures = () => {
