@@ -170,7 +170,7 @@ setupXR() {
     }; 
  
     // Define onSessionEnd function 
-    const onSessionEnd = () => { 
+    const onSessionEnd = () =>{ 
         console.log('XR session ended'); 
         this.camera.remove(this.ui.mesh); 
     }; 
@@ -210,7 +210,7 @@ this.setupControllerGestures();
      this.scene.add( this.controller );     
  
     // Hit testing function 
-    function setupHitTesting = () => { 
+    function setupHitTesting { 
         this.hitTestSourceRequested = false; 
         this.hitTestSource = null; 
  
@@ -262,7 +262,7 @@ this.setupControllerGestures();
 }
  
     // Controller gestures function 
-   function setupControllerGestures = () => { 
+   function setupControllerGestures{ 
         this.gestures = new ControllerGestures(this.renderer); 
         const self = this; 
  
