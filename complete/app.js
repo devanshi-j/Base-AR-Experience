@@ -204,8 +204,8 @@ class App {
           }
         };
       
-        setupHitTesting();
-        setupControllerGestures();
+        this.setupHitTesting();
+        this.setupControllerGestures();
       
         this.renderer.setAnimationLoop(this.render.bind(this));
       
@@ -332,10 +332,7 @@ class App {
 
     };
 
-    setupHitTesting();
-    setupControllerGestures();
-
-    this.renderer.setAnimationLoop(this.render.bind(this));
+    
 
     }
 
