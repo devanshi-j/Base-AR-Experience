@@ -424,36 +424,35 @@ setupXR() {
   } 
 }*/ 
  
- render(timestamp, frame) { 
-    const dt = this.clock.getDelta(); 
-    this.stats.update(); 
- 
-    if (this.renderer.xr.isPresenting) { 
-        this.gestures.update(); // Update controller gestures (assuming gestures object exists) 
-        this.ui.update(); // Update UI element (assuming ui object exists) 
-    } 
- 
-    if (this.knight !== undefined) { 
-        this.knight.update(dt); // Update knight animation (if it exists) 
-    } 
- 
-    try { 
-        this.renderer.render(this.scene, this.camera); // Render the scene 
- 
-        if (frame) { 
-            if (this.hitTestSourceRequested === false) { 
-                requestHitTestSource(); // Request hit test source if not already requested 
-            } 
- 
-            if (this.hitTestSource) { 
-                getHitTestResults(frame); // Get hit test results if hit test source is available 
-            } 
-        } 
-    } catch (error) { 
-        console.error("Error during rendering:", error); 
-        // Handle the error gracefully (e.g., display an error message) 
-    } 
-} 
+render(timestamp, frame) {
+    const dt = this.clock.getDelta();
+    this.stats.update();
+
+    if (this.renderer.xr.isPresenting) {
+        this.gestures.update(); // Update controller gestures (assuming gestures object exists)
+        this.ui.update(); // Update UI element (assuming ui object exists)
+    }
+
+    if (this.knight !== undefined) {
+        this.knight.update(dt); // Update knight animation (if it exists)
+    }
+
+    try {
+        this.renderer.render(this.scene, this.camera); // Render the scene
+
+        if (frame) {
+            if (this.hitTestSourceRequested === false) {
+                this.requestHitTestSource(); // Request hit test source if not already requested
+            }
+
+            if (this.hitTestSource) {
+                this.getHitTestResults(frame); // Get hit test results if hit test source is available
+            }
+        }
+    } catch (error) {
+        console.error("Error during rendering:", error);
+        // Handle the error gracefully (e.g., display an error message)
+    }
 }
 
  
