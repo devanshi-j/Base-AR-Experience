@@ -50,8 +50,9 @@ class App {
         this.quaternion = new THREE.Quaternion();
 
         this.initScene();
-       this.setupXR();
+        this.setupXR();
         this.loadKnight();
+         this.setupXR = this.setupXR.bind(this);
         window.addEventListener('resize', this.resize.bind(this));
     }
 
