@@ -454,6 +454,7 @@ render(timestamp, frame) {
         // Handle the error gracefully (e.g., display an error message)
     }
 }
+}
 
  
 export { App };
