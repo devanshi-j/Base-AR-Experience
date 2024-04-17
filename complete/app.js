@@ -221,6 +221,41 @@ setupXR() {
         } else {
             console.warn('XR session is not active. Hit-testing cannot be initialized.');
         }
+
+        requestHitTestSource() {
+        const self = this;
+    
+        const session = this.renderer.xr.getSession();
+    
+        session.requestReferenceSpace('viewer').then(function (referenceSpace) {
+            session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
+                self.hitTestSource = source;
+            });
+        });
+    
+        session.addEventListener('end', function () {
+            self.hitTestSourceRequested = false;
+            self.hitTestSource = null;
+            self.referenceSpace = null;
+        });
+    
+        this.hitTestSourceRequested = true;
+    }
+    getHitTestResults(frame) {
+        if (!this.hitTestSourceRequested || !this.hitTestSource) return;
+
+        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
+
+        if (hitTestResults.length) {
+            const referenceSpace = this.renderer.xr.getReferenceSpace();
+            const hit = hitTestResults[0];
+            const pose = hit.getPose(referenceSpace);
+            this.reticle.visible = true;
+            this.reticle.matrix.fromArray(pose.transform.matrix);
+        } else {
+            this.reticle.visible = false;
+        }
+
     };
 
     // Controller gestures function
@@ -298,8 +333,6 @@ setupXR() {
 
         // Other gesture event listeners...
     };
-
-    
     this.setupHitTesting();
     this.setupControllerGestures();
 }
@@ -400,6 +433,7 @@ render(timestamp, frame) {
         console.error("Error during rendering:", error);
         // Handle the error gracefully (e.g., display an error message)
     }
+}
 }
 }
 
