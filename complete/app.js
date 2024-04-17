@@ -50,7 +50,7 @@ class App {
         this.quaternion = new THREE.Quaternion(); 
  
         this.initScene(); 
-       this.setupXR(); 
+        this.setupXR(); 
         this.loadKnight(); 
         window.addEventListener('resize', this.resize.bind(this)); 
     } 
@@ -157,13 +157,13 @@ class App {
     } 
  
      
+
+    
  
 setupXR() { 
     this.renderer.xr.enabled = true; 
  
-     
-     
-    const onSessionStart = () => { 
+     const onSessionStart = () => { 
         console.log('XR session started'); 
         this.ui.mesh.position.set(0, -0.15, -0.3); 
         this.camera.add(this.ui.mesh); 
@@ -186,7 +186,8 @@ setupXR() {
     } 
 }); 
  
- 
+this.setupHitTesting(); 
+this.setupControllerGestures(); 
  
     // Define onSelect function 
     const onSelect = () => { 
@@ -206,18 +207,17 @@ setupXR() {
  
     this.controller = this.renderer.xr.getController( 0 ); 
     this.controller.addEventListener( 'select', onSelect ); 
-     
-    this.scene.add( this.controller );     
+     this.scene.add( this.controller );     
  
     // Hit testing function 
-    const setupHitTesting = () => { 
+    setupHitTesting = () => { 
         this.hitTestSourceRequested = false; 
         this.hitTestSource = null; 
  
         // Check if the XR session is active 
         const session = this.renderer.xr.getSession(); 
         if (session !== null) { 
-            this.requestHitTestSource(); 
+            requestHitTestSource();
         } else { 
             console.warn('XR session is not active. Hit-testing cannot be initialized.'); 
         } 
@@ -240,6 +240,7 @@ setupXR() {
         }); 
      
         this.hitTestSourceRequested = true; 
+
     }; 
  
     function getHitTestResults(frame) { 
@@ -261,7 +262,7 @@ setupXR() {
 }
  
     // Controller gestures function 
-    const setupControllerGestures = () => { 
+    setupControllerGestures = () => { 
         this.gestures = new ControllerGestures(this.renderer); 
         const self = this; 
  
@@ -335,8 +336,7 @@ setupXR() {
  
         // Other gesture event listeners... 
     }; 
-    this.setupHitTesting(); 
-    this.setupControllerGestures(); 
+   
 
 }
  
@@ -425,11 +425,11 @@ setupXR() {
  
         if (frame) { 
             if (this.hitTestSourceRequested === false) { 
-                this.requestHitTestSource(); // Request hit test source if not already requested 
+                requestHitTestSource(); // Request hit test source if not already requested 
             } 
  
             if (this.hitTestSource) { 
-                this.getHitTestResults(frame); // Get hit test results if hit test source is available 
+                getHitTestResults(frame); // Get hit test results if hit test source is available 
             } 
         } 
     } catch (error) { 
