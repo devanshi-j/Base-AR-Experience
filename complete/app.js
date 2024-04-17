@@ -209,7 +209,7 @@ setupXR() {
      this.scene.add( this.controller );     
  
     // Hit testing function 
-  setupHitTesting = () =>{
+ setupHitTesting = () => {
   const self = this;
 
   let hitTestSourceRequested = false;
@@ -261,18 +261,8 @@ setupXR() {
 }
 
     // Controller gestures function 
-    setupControllerGestures = () => {
-        // Ensure that the necessary variables are defined and initialized elsewhere in your code.
-        // Example:
-        // this.ui = ...;
-        // this.knight = ...;
-        // this.scene = ...;
-        // this.isDragging = ...;
-        // this.dragStartPosition = ...;
-        // this.startPosition = ...;
-        // this.startScale = ...;
-        // this.startQuaternion = ...;
-    
+setupControllerGestures = () => {
+        
         // Assuming ControllerGestures is properly defined and instantiated elsewhere in your code.
         this.gestures = new ControllerGestures(this.renderer);
         const self = this;
@@ -346,24 +336,10 @@ setupXR() {
             }
         });
     }
-    this.setupHitTesting(); 
-this.setupControllerGestures(); 
+    this.setupHitTesting();
+    this.setupControllerGestures();
 }
 
-
- 
-
-
-
-
- 
-// Call the setupXR function 
- 
- 
-     
-    // Call the setupXR function 
-     
-     
  
  
    /*render(timestamp, frame) { 
@@ -454,6 +430,7 @@ render(timestamp, frame) {
         // Handle the error gracefully (e.g., display an error message)
     }
 }
+
 }
 
  
