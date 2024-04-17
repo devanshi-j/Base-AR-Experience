@@ -210,44 +210,31 @@ this.setupControllerGestures();
      this.scene.add( this.controller );     
  
     // Hit testing function 
-    function setupHitTesting { 
-        this.hitTestSourceRequested = false; 
-        this.hitTestSource = null; 
- 
-        // Check if the XR session is active 
-        const session = this.renderer.xr.getSession(); 
-        if (session !== null) { 
-            requestHitTestSource();
-        } else { 
-            console.warn('XR session is not active. Hit-testing cannot be initialized.'); 
-        } 
- 
-        function requestHitTestSource() { 
+    function requestHitTestSource() { 
         const self = this; 
-     
+    
         const session = this.renderer.xr.getSession(); 
-     
+    
         session.requestReferenceSpace('viewer').then(function (referenceSpace) { 
             session.requestHitTestSource({ space: referenceSpace }).then(function (source) { 
                 self.hitTestSource = source; 
             }); 
         }); 
-     
+    
         session.addEventListener('end', function () { 
             self.hitTestSourceRequested = false; 
             self.hitTestSource = null; 
             self.referenceSpace = null; 
         }); 
-     
+    
         this.hitTestSourceRequested = true; 
-
     }; 
- 
+
     function getHitTestResults(frame) { 
         if (!this.hitTestSourceRequested || !this.hitTestSource) return; 
- 
+    
         const hitTestResults = frame.getHitTestResults(this.hitTestSource); 
- 
+    
         if (hitTestResults.length) { 
             const referenceSpace = this.renderer.xr.getReferenceSpace(); 
             const hit = hitTestResults[0]; 
@@ -257,88 +244,99 @@ this.setupControllerGestures();
         } else { 
             this.reticle.visible = false; 
         } 
- 
     }; 
-}
+    
  
     // Controller gestures function 
-   function setupControllerGestures{ 
-        this.gestures = new ControllerGestures(this.renderer); 
-        const self = this; 
- 
-        this.gestures.addEventListener('tap', (ev) => { 
-            self.ui.updateElement('info', 'tap'); 
-            if (!self.knight.object.visible) { 
-                self.knight.object.visible = true; 
-                self.knight.object.position.set(0, -0.3, -0.5).add(ev.position); 
-                self.scene.add(self.knight.object); 
-            } 
-        }); 
- 
-        this.gestures.addEventListener('doubletap', (ev) => { 
-            self.ui.updateElement('info', 'doubletap'); 
-        }); 
-     
-        this.gestures.addEventListener('press', (ev) => { 
-            self.ui.updateElement('info', 'press'); 
-        }); 
-     
-        this.gestures.addEventListener('press', (ev) => { 
-            if (!self.knight.object.visible) return; 
-     
-            self.isDragging = true; 
-            self.dragStartPosition.copy(self.knight.object.position); 
-            self.ui.updateElement('info', 'Drag started'); 
-        }); 
-     
-        this.gestures.addEventListener('pan', (ev) => { 
-            if (!self.isDragging) return; 
-     
-            if (ev.initialise !== undefined) { 
-                self.startPosition = self.knight.object.position.clone(); 
-            } else { 
-                const dragSensitivity = 3; 
-                const delta = ev.delta.multiplyScalar(dragSensitivity); 
-                const newPosition = self.startPosition.clone().add(delta); 
-     
-                self.knight.object.position.copy(newPosition); 
-                self.ui.updateElement('info', `Dragging: x:${delta.x.toFixed(3)}, y:${delta.y.toFixed(3)}, z:${delta.z.toFixed(3)}`); 
-            } 
-        }); 
-     
-        this.gestures.addEventListener('swipe', (ev) => { 
-            self.ui.updateElement('info', `swipe ${ev.direction}`); 
-            if (self.knight.object.visible) { 
-                self.knight.object.visible = false; 
-                self.scene.remove(self.knight.object); 
-            } 
-        }); 
-     
-        this.gestures.addEventListener('pinch', (ev) => { 
-            if (ev.initialise !== undefined) { 
-                self.startScale = self.knight.object.scale.clone(); 
-            } else { 
-                const scale = self.startScale.clone().multiplyScalar(ev.scale); 
-                self.knight.object.scale.copy(scale); 
-                self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}`); 
-            } 
-        }); 
-     
-        this.gestures.addEventListener('rotate', (ev) => { 
-            if (ev.initialise !== undefined) { 
-                self.startQuaternion = self.knight.object.quaternion.clone(); 
-            } else { 
-                self.knight.object.quaternion.copy(self.startQuaternion); 
-                self.knight.object.rotateY(ev.theta); 
-                self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`); 
-            } 
-        }); 
- 
-        // Other gesture event listeners... 
-    }; 
-   
-
+    function setupControllerGestures() {
+        // Ensure that the necessary variables are defined and initialized elsewhere in your code.
+        // Example:
+        // this.ui = ...;
+        // this.knight = ...;
+        // this.scene = ...;
+        // this.isDragging = ...;
+        // this.dragStartPosition = ...;
+        // this.startPosition = ...;
+        // this.startScale = ...;
+        // this.startQuaternion = ...;
+    
+        // Assuming ControllerGestures is properly defined and instantiated elsewhere in your code.
+        this.gestures = new ControllerGestures(this.renderer);
+        const self = this;
+    
+        this.gestures.addEventListener('tap', (ev) => {
+            self.ui.updateElement('info', 'tap');
+            if (!self.knight.object.visible) {
+                self.knight.object.visible = true;
+                self.knight.object.position.set(0, -0.3, -0.5).add(ev.position);
+                self.scene.add(self.knight.object);
+            }
+        });
+    
+        this.gestures.addEventListener('doubletap', (ev) => {
+            self.ui.updateElement('info', 'doubletap');
+        });
+    
+        // The following two 'press' event listeners seem redundant. Consider combining them or renaming one.
+        this.gestures.addEventListener('press', (ev) => {
+            self.ui.updateElement('info', 'press');
+        });
+    
+        this.gestures.addEventListener('press', (ev) => {
+            if (!self.knight.object.visible) return;
+    
+            self.isDragging = true;
+            self.dragStartPosition.copy(self.knight.object.position);
+            self.ui.updateElement('info', 'Drag started');
+        });
+    
+        this.gestures.addEventListener('pan', (ev) => {
+            if (!self.isDragging) return;
+    
+            if (ev.initialise !== undefined) {
+                self.startPosition = self.knight.object.position.clone();
+            } else {
+                const dragSensitivity = 3;
+                const delta = ev.delta.multiplyScalar(dragSensitivity);
+                const newPosition = self.startPosition.clone().add(delta);
+    
+                self.knight.object.position.copy(newPosition);
+                self.ui.updateElement('info', `Dragging: x:${delta.x.toFixed(3)}, y:${delta.y.toFixed(3)}, z:${delta.z.toFixed(3)}`);
+            }
+        });
+    
+        this.gestures.addEventListener('swipe', (ev) => {
+            self.ui.updateElement('info', `swipe ${ev.direction}`);
+            if (self.knight.object.visible) {
+                self.knight.object.visible = false;
+                self.scene.remove(self.knight.object);
+            }
+        });
+    
+        this.gestures.addEventListener('pinch', (ev) => {
+            if (ev.initialise !== undefined) {
+                self.startScale = self.knight.object.scale.clone();
+            } else {
+                const scale = self.startScale.clone().multiplyScalar(ev.scale);
+                self.knight.object.scale.copy(scale);
+                self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}`);
+            }
+        });
+    
+        this.gestures.addEventListener('rotate', (ev) => {
+            if (ev.initialise !== undefined) {
+                self.startQuaternion = self.knight.object.quaternion.clone();
+            } else {
+                self.knight.object.quaternion.copy(self.startQuaternion);
+                self.knight.object.rotateY(ev.theta);
+                self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
+            }
+        });
+    };
+    
 }
+
+
  
 // Call the setupXR function 
  
@@ -441,5 +439,4 @@ this.setupControllerGestures();
 } 
  
 export { App };
-
 
