@@ -52,7 +52,8 @@ class App {
         this.initScene();
         this.setupXR();
         this.loadKnight();
-         this.setupXR = this.setupXR.bind(this);
+        this.setupXR = this.setupXR.bind(this);
+        this.onSelect = this.onSelect.bind(this);
         window.addEventListener('resize', this.resize.bind(this));
     }
 
@@ -173,11 +174,28 @@ setupXR() {
     }
 });
 
+     const onSelect = () => {
+        console.log('Controller select event triggered');
+        if (this.knight === undefined) return;
+
+        if (this.reticle.visible) {
+            if (this.knight.object.visible) {
+                this.workingVec3.setFromMatrixPosition(this.reticle.matrix);
+                this.knight.newPath(this.workingVec3);
+            } else {
+                this.knight.object.position.setFromMatrixPosition(this.reticle.matrix);
+                this.knight.object.visible = true;
+            }
+        }
+    };
+
 
     // Set up controller and event listener
     this.controller = this.renderer.xr.getController(0);
     this.controller.addEventListener('select', this.onSelect.bind(this));
     this.scene.add(this.controller);
+
+   
 
     // Hit testing function
     const setupHitTesting = () => {
@@ -283,21 +301,7 @@ setupXR() {
     };
 
     // Define onSelect function
-    const onSelect = () => {
-        console.log('Controller select event triggered');
-        if (this.knight === undefined) return;
-
-        if (this.reticle.visible) {
-            if (this.knight.object.visible) {
-                this.workingVec3.setFromMatrixPosition(this.reticle.matrix);
-                this.knight.newPath(this.workingVec3);
-            } else {
-                this.knight.object.position.setFromMatrixPosition(this.reticle.matrix);
-                this.knight.object.visible = true;
-            }
-        }
-    };
-
+   
     // Call nested functions
     this.setupHitTesting();
     this.setupControllerGestures();
