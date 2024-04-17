@@ -163,15 +163,16 @@ setupXR() {
     this.renderer.xr.enabled = true;
 
     // Initialize XR button
-    const btn = new ARButton(this.renderer, {
-        onSessionStart: this.onSessionStart.bind(this),
-        onSessionEnd: this.onSessionEnd.bind(this),
-        sessionInit: {
-            requiredFeatures: ['hit-test'],
-            optionalFeatures: ['dom-overlay'],
-            domOverlay: { root: document.body }
-        }
-    });
+   const btn = new ARButton(this.renderer, {
+    onSessionStart: () => this.onSessionStart(),
+    onSessionEnd: () => this.onSessionEnd(),
+    sessionInit: {
+        requiredFeatures: ['hit-test'],
+        optionalFeatures: ['dom-overlay'],
+        domOverlay: { root: document.body }
+    }
+});
+
 
     // Set up controller and event listener
     this.controller = this.renderer.xr.getController(0);
