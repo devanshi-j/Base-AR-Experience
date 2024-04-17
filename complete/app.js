@@ -346,13 +346,13 @@ setupXR() {
             }
         });
     }
-    
+    //this.setupHitTesting(); 
+//this.setupControllerGestures(); 
 }
 
-//this.setupHitTesting(); 
-//this.setupControllerGestures(); 
+
  
-}
+
 
 
 
@@ -454,8 +454,7 @@ setupXR() {
         // Handle the error gracefully (e.g., display an error message) 
     } 
 } 
+}
 
-} 
  
 export { App };
-
