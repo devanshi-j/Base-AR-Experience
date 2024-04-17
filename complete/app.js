@@ -209,7 +209,7 @@ setupXR() {
      this.scene.add( this.controller );     
  
     // Hit testing function 
-    function setupHitTesting() {
+  setupHitTesting = () =>{
   const self = this;
 
   let hitTestSourceRequested = false;
@@ -261,7 +261,7 @@ setupXR() {
 }
 
     // Controller gestures function 
-    function setupControllerGestures() {
+    setupControllerGestures = () => {
         // Ensure that the necessary variables are defined and initialized elsewhere in your code.
         // Example:
         // this.ui = ...;
@@ -346,8 +346,8 @@ setupXR() {
             }
         });
     }
-    //this.setupHitTesting(); 
-//this.setupControllerGestures(); 
+    this.setupHitTesting(); 
+this.setupControllerGestures(); 
 }
 
 
