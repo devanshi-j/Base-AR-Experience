@@ -9,8 +9,6 @@ import { Player } from '../libs/Player.js';
 import { ControllerGestures } from '../libs/ControllerGestures.js';
 import { RGBELoader } from '../libs/three/jsm/RGBELoader.js';
 
-
-
 class App {
     constructor() {
         const container = document.createElement('div');
@@ -81,6 +79,8 @@ class App {
     }
 
     loadKnight() {
+
+        
         this.loadingBar = new LoadingBar();
         const loader = new GLTFLoader().setPath(this.assetsPath);
         const self = this;
@@ -156,111 +156,43 @@ class App {
         this.ui = ui;
     }
 
-    setupXR() {
-        this.renderer.xr.enabled = true;
-
-        // Initialize XR button
-        const btn = new ARButton(this.renderer, {
-            onSessionStart: this.onSessionStart.bind(this),
-            onSessionEnd: this.onSessionEnd.bind(this),
-            sessionInit: {
-                requiredFeatures: ['hit-test'],
-                optionalFeatures: ['dom-overlay'],
-                domOverlay: { root: document.body }
-            }
-        });
     
-        this.controller = this.renderer.xr.getController(0);
-        this.scene.add(this.controller);
-      
-        // Add event listener for controller select
-        this.controller.addEventListener('select', this.onSelect.bind(this));
 
-        self.ui.mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), new THREE.MeshBasicMaterial({ color: 0xffffff })); // Replace with your mesh creation
-      
-        // Define session event handlers
-        const self = this;
-        this.onSessionStart = function() {
-          console.log('XR session started');
-          self.ui.mesh.position.set(0, -0.15, -0.3); // Ensure self.ui.mesh is defined before use
-          self.camera.add(self.ui.mesh);
-        };
-      
-        this.onSessionEnd = function() {
-          console.log('XR session ended');
-          self.camera.remove(self.ui.mesh);
-        };
-      
-        this.onSelect = function() {
-          console.log('Controller select event triggered');
-          if (self.knight === undefined) return;
-      
-          if (self.reticle.visible) {
-            if (self.knight.object.visible) {
-              self.workingVec3.setFromMatrixPosition(self.reticle.matrix);
-              self.knight.newPath(self.workingVec3);
-            } else {
-              self.knight.object.position.setFromMatrixPosition(self.reticle.matrix);
-              self.knight.object.visible = true;
-            }
-          }
-        };
-      
-        this.setupHitTesting();
-        this.setupControllerGestures();
-      
-        this.renderer.setAnimationLoop(this.render.bind(this));
-      
-    
-  
-        /*setupHitTesting = () => {
-            this.hitTestSourceRequested = false;
-            this.hitTestSource = null;
-          
-            // Check if the XR session is active
-            const session = this.renderer.xr.getSession();
-            if (session !== null) {
-              this.requestHitTestSource();
-            } else {
-              console.warn('XR session is not active. Hit-testing cannot be initialized.');
-            }
-          
-            requestHitTestSource() {
-              const self = this;
-              const session = this.renderer.xr.getSession();
-          
-              session.requestReferenceSpace('viewer').then(function (referenceSpace) {
-                session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
-                  self.hitTestSource = source;
-                });
-              });
-          
-              // Removed duplicate event listener
-            }
-          
-            getHitTestResults(frame) {
-              const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-          
-              if (hitTestResults.length) {
-                const referenceSpace = this.renderer.xr.getReferenceSpace(); // Check for existence (optional)
-                if (referenceSpace) {
-                  const hit = hitTestResults[0];
-                  const pose = hit.getPose(referenceSpace);
-          
-                  self.reticle.visible = true;
-                  self.reticle.matrix.fromArray(pose.transform.matrix);
-                } else {
-                  console.warn('getReferenceSpace not available. Hit-testing might be limited.');
-                }
-              } else {
-                self.reticle.visible = false;
-              }
-            }
-        
-          };*/
-          
+setupXR() {
+    this.renderer.xr.enabled = true;
 
-    setupControllerGestures = () => {
+    // Initialize XR button
+    const btn = new ARButton(this.renderer, {
+        onSessionStart: this.onSessionStart.bind(this),
+        onSessionEnd: this.onSessionEnd.bind(this),
+        sessionInit: {
+            requiredFeatures: ['hit-test'],
+            optionalFeatures: ['dom-overlay'],
+            domOverlay: { root: document.body }
+        }
+    });
+
+    // Set up controller and event listener
+    this.controller = this.renderer.xr.getController(0);
+    this.controller.addEventListener('select', this.onSelect.bind(this));
+    this.scene.add(this.controller);
+
+    // Hit testing function
+    const setupHitTesting = () => {
+        this.hitTestSourceRequested = false;
+        this.hitTestSource = null;
+
+        // Check if the XR session is active
+        const session = this.renderer.xr.getSession();
+        if (session !== null) {
+            this.requestHitTestSource();
+        } else {
+            console.warn('XR session is not active. Hit-testing cannot be initialized.');
+        }
+    };
+
+    // Controller gestures function
+    const setupControllerGestures = () => {
         this.gestures = new ControllerGestures(this.renderer);
         const self = this;
 
@@ -276,34 +208,34 @@ class App {
         this.gestures.addEventListener('doubletap', (ev) => {
             self.ui.updateElement('info', 'doubletap');
         });
-
+    
         this.gestures.addEventListener('press', (ev) => {
             self.ui.updateElement('info', 'press');
         });
-
+    
         this.gestures.addEventListener('press', (ev) => {
             if (!self.knight.object.visible) return;
-
+    
             self.isDragging = true;
             self.dragStartPosition.copy(self.knight.object.position);
             self.ui.updateElement('info', 'Drag started');
         });
-
+    
         this.gestures.addEventListener('pan', (ev) => {
             if (!self.isDragging) return;
-
+    
             if (ev.initialise !== undefined) {
                 self.startPosition = self.knight.object.position.clone();
             } else {
                 const dragSensitivity = 3;
                 const delta = ev.delta.multiplyScalar(dragSensitivity);
                 const newPosition = self.startPosition.clone().add(delta);
-
+    
                 self.knight.object.position.copy(newPosition);
                 self.ui.updateElement('info', `Dragging: x:${delta.x.toFixed(3)}, y:${delta.y.toFixed(3)}, z:${delta.z.toFixed(3)}`);
             }
         });
-
+    
         this.gestures.addEventListener('swipe', (ev) => {
             self.ui.updateElement('info', `swipe ${ev.direction}`);
             if (self.knight.object.visible) {
@@ -311,7 +243,7 @@ class App {
                 self.scene.remove(self.knight.object);
             }
         });
-
+    
         this.gestures.addEventListener('pinch', (ev) => {
             if (ev.initialise !== undefined) {
                 self.startScale = self.knight.object.scale.clone();
@@ -321,7 +253,7 @@ class App {
                 self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}`);
             }
         });
-
+    
         this.gestures.addEventListener('rotate', (ev) => {
             if (ev.initialise !== undefined) {
                 self.startQuaternion = self.knight.object.quaternion.clone();
@@ -332,14 +264,49 @@ class App {
             }
         });
 
+        // Other gesture event listeners...
     };
 
+    // Define onSessionStart function
+    const onSessionStart = () => {
+        console.log('XR session started');
+        this.ui.mesh.position.set(0, -0.15, -0.3);
+        this.camera.add(this.ui.mesh);
+    };
+
+    // Define onSessionEnd function
+    const onSessionEnd = () => {
+        console.log('XR session ended');
+        this.camera.remove(this.ui.mesh);
+    };
+
+    // Define onSelect function
+    const onSelect = () => {
+        console.log('Controller select event triggered');
+        if (this.knight === undefined) return;
+
+        if (this.reticle.visible) {
+            if (this.knight.object.visible) {
+                this.workingVec3.setFromMatrixPosition(this.reticle.matrix);
+                this.knight.newPath(this.workingVec3);
+            } else {
+                this.knight.object.position.setFromMatrixPosition(this.reticle.matrix);
+                this.knight.object.visible = true;
+            }
+        }
+    };
+
+    // Call nested functions
+    this.setupHitTesting();
+    this.setupControllerGestures();
+}
+
+// Call the setupXR function
+
+
     
-
-    }
-
-
-
+    // Call the setupXR function
+    
     
 
 
@@ -432,6 +399,5 @@ render(timestamp, frame) {
     }
 }
 }
-
 
 export { App };
