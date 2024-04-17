@@ -50,10 +50,8 @@ class App {
         this.quaternion = new THREE.Quaternion();
 
         this.initScene();
-        this.setupXR();
+       this.setupXR();
         this.loadKnight();
-        this.setupXR = this.setupXR.bind(this);
-        this.onSelect = this.onSelect.bind(this);
         window.addEventListener('resize', this.resize.bind(this));
     }
 
@@ -163,18 +161,34 @@ class App {
 setupXR() {
     this.renderer.xr.enabled = true;
 
-    // Initialize XR button
-   const btn = new ARButton(this.renderer, {
-    onSessionStart: () => this.onSessionStart(),
-    onSessionEnd: () => this.onSessionEnd(),
-    sessionInit: {
-        requiredFeatures: ['hit-test'],
-        optionalFeatures: ['dom-overlay'],
-        domOverlay: { root: document.body }
-    }
-});
+    
+    
+    const onSessionStart = () => {
+        console.log('XR session started');
+        this.ui.mesh.position.set(0, -0.15, -0.3);
+        this.camera.add(this.ui.mesh);
+    };
 
-     const onSelect = () => {
+    // Define onSessionEnd function
+    const onSessionEnd = () => {
+        console.log('XR session ended');
+        this.camera.remove(this.ui.mesh);
+    };
+   
+    // Initialize XR button
+    const btn = new ARButton(this.renderer, {
+        onSessionStart: this.onSessionStart.bind(this),
+        onSessionEnd: this.onSessionEnd.bind(this),
+        sessionInit: {
+            requiredFeatures: ['hit-test'],
+            optionalFeatures: ['dom-overlay'],
+            domOverlay: { root: document.body }
+        }
+    });
+
+
+    // Define onSelect function
+    const onSelect = () => {
         console.log('Controller select event triggered');
         if (this.knight === undefined) return;
 
@@ -189,13 +203,10 @@ setupXR() {
         }
     };
 
-
-    // Set up controller and event listener
-    this.controller = this.renderer.xr.getController(0);
-    this.controller.addEventListener('select', this.onSelect.bind(this));
-    this.scene.add(this.controller);
-
-   
+    this.controller = this.renderer.xr.getController( 0 );
+    this.controller.addEventListener( 'select', onSelect );
+    
+    this.scene.add( this.controller );    
 
     // Hit testing function
     const setupHitTesting = () => {
@@ -287,22 +298,7 @@ setupXR() {
         // Other gesture event listeners...
     };
 
-    // Define onSessionStart function
-    const onSessionStart = () => {
-        console.log('XR session started');
-        this.ui.mesh.position.set(0, -0.15, -0.3);
-        this.camera.add(this.ui.mesh);
-    };
-
-    // Define onSessionEnd function
-    const onSessionEnd = () => {
-        console.log('XR session ended');
-        this.camera.remove(this.ui.mesh);
-    };
-
-    // Define onSelect function
-   
-    // Call nested functions
+    
     this.setupHitTesting();
     this.setupControllerGestures();
 }
