@@ -210,43 +210,44 @@ this.setupControllerGestures();
      this.scene.add( this.controller );     
  
     // Hit testing function 
-    function requestHitTestSource() { 
-        const self = this; 
+    function setupHitTesting() {
+        const self = this;
     
-        const session = this.renderer.xr.getSession(); 
+        function requestHitTestSource() {
+            const session = self.renderer.xr.getSession();
     
-        session.requestReferenceSpace('viewer').then(function (referenceSpace) { 
-            session.requestHitTestSource({ space: referenceSpace }).then(function (source) { 
-                self.hitTestSource = source; 
-            }); 
-        }); 
+            session.requestReferenceSpace('viewer').then(function (referenceSpace) {
+                session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
+                    self.hitTestSource = source;
+                });
+            });
     
-        session.addEventListener('end', function () { 
-            self.hitTestSourceRequested = false; 
-            self.hitTestSource = null; 
-            self.referenceSpace = null; 
-        }); 
+            session.addEventListener('end', function () {
+                self.hitTestSourceRequested = false;
+                self.hitTestSource = null;
+                self.referenceSpace = null;
+            });
     
-        this.hitTestSourceRequested = true; 
-    }; 
+            self.hitTestSourceRequested = true;
+        }
+    
+        function getHitTestResults(frame) {
+            if (!self.hitTestSourceRequested || !self.hitTestSource) return;
+    
+            const hitTestResults = frame.getHitTestResults(self.hitTestSource);
+    
+            if (hitTestResults.length) {
+                const referenceSpace = self.renderer.xr.getReferenceSpace();
+                const hit = hitTestResults[0];
+                const pose = hit.getPose(referenceSpace);
+                self.reticle.visible = true;
+                self.reticle.matrix.fromArray(pose.transform.matrix);
+            } else {
+                self.reticle.visible = false;
+            }
+        }
 
-    function getHitTestResults(frame) { 
-        if (!this.hitTestSourceRequested || !this.hitTestSource) return; 
     
-        const hitTestResults = frame.getHitTestResults(this.hitTestSource); 
-    
-        if (hitTestResults.length) { 
-            const referenceSpace = this.renderer.xr.getReferenceSpace(); 
-            const hit = hitTestResults[0]; 
-            const pose = hit.getPose(referenceSpace); 
-            this.reticle.visible = true; 
-            this.reticle.matrix.fromArray(pose.transform.matrix); 
-        } else { 
-            this.reticle.visible = false; 
-        } 
-    }; 
-    
- 
     // Controller gestures function 
     function setupControllerGestures() {
         // Ensure that the necessary variables are defined and initialized elsewhere in your code.
@@ -334,6 +335,7 @@ this.setupControllerGestures();
         });
     };
     
+}
 }
 
 
