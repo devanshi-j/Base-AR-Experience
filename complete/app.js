@@ -186,8 +186,7 @@ setupXR() {
     } 
 }); 
  
-this.setupHitTesting(); 
-this.setupControllerGestures(); 
+
  
     // Define onSelect function 
     const onSelect = () => { 
@@ -333,10 +332,15 @@ this.setupControllerGestures();
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
             }
         });
-    };
+    }
     
 }
+
+this.setupHitTesting(); 
+this.setupControllerGestures(); 
+ 
 }
+
 
 
  
