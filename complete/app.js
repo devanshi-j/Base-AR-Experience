@@ -210,7 +210,7 @@ this.setupControllerGestures();
      this.scene.add( this.controller );     
  
     // Hit testing function 
-    setupHitTesting = () => { 
+    function setupHitTesting = () => { 
         this.hitTestSourceRequested = false; 
         this.hitTestSource = null; 
  
@@ -262,7 +262,7 @@ this.setupControllerGestures();
 }
  
     // Controller gestures function 
-    setupControllerGestures = () => { 
+   function setupControllerGestures = () => { 
         this.gestures = new ControllerGestures(this.renderer); 
         const self = this; 
  
