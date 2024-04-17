@@ -210,43 +210,56 @@ setupXR() {
  
     // Hit testing function 
     function setupHitTesting() {
-        const self = this;
-    
-        function requestHitTestSource() {
-            const session = self.renderer.xr.getSession();
-    
-            session.requestReferenceSpace('viewer').then(function (referenceSpace) {
-                session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
-                    self.hitTestSource = source;
-                });
-            });
-    
-            session.addEventListener('end', function () {
-                self.hitTestSourceRequested = false;
-                self.hitTestSource = null;
-                self.referenceSpace = null;
-            });
-    
-            self.hitTestSourceRequested = true;
-        }
-    
-        function getHitTestResults(frame) {
-            if (!self.hitTestSourceRequested || !self.hitTestSource) return;
-    
-            const hitTestResults = frame.getHitTestResults(self.hitTestSource);
-    
-            if (hitTestResults.length) {
-                const referenceSpace = self.renderer.xr.getReferenceSpace();
-                const hit = hitTestResults[0];
-                const pose = hit.getPose(referenceSpace);
-                self.reticle.visible = true;
-                self.reticle.matrix.fromArray(pose.transform.matrix);
-            } else {
-                self.reticle.visible = false;
-            }
-        }
+  const self = this;
 
-    
+  let hitTestSourceRequested = false;
+  let hitTestSource = null;
+  let referenceSpace = null;
+
+  function requestHitTestSource() {
+    const session = self.renderer.xr.getSession();
+
+    if (session) {
+      session.requestReferenceSpace('viewer').then(function (referenceSpace) {
+        self.referenceSpace = referenceSpace;
+        session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
+          self.hitTestSource = source;
+          hitTestSourceRequested = true;
+        });
+      });
+
+      session.addEventListener('end', function () {
+        hitTestSourceRequested = false;
+        hitTestSource = null;
+        referenceSpace = null;
+      });
+    } else {
+      console.warn('XR session not found. Hit testing unavailable.');
+    }
+  }
+
+  function getHitTestResults(frame) {
+    if (!hitTestSourceRequested || !hitTestSource) return;
+
+    const hitTestResults = frame.getHitTestResults(hitTestSource);
+
+    if (hitTestResults.length) {
+      const hit = hitTestResults[0];
+      const pose = hit.getPose(referenceSpace);
+      self.reticle.visible = true;
+      self.reticle.matrix.fromArray(pose.transform.matrix);
+    } else {
+      self.reticle.visible = false;
+    }
+  }
+
+  // Call requestHitTestSource when the XR session starts
+  self.renderer.xr.addEventListener('sessionstart', requestHitTestSource);
+
+  // Update hit test results on each rendered frame
+  self.renderer.xr.addEventListener('render', getHitTestResults);
+}
+
     // Controller gestures function 
     function setupControllerGestures() {
         // Ensure that the necessary variables are defined and initialized elsewhere in your code.
@@ -336,8 +349,8 @@ setupXR() {
     
 }
 
-this.setupHitTesting(); 
-this.setupControllerGestures(); 
+//this.setupHitTesting(); 
+//this.setupControllerGestures(); 
  
 }
 
