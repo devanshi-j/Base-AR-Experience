@@ -1,186 +1,47 @@
-import * as THREE from '../libs/three/three.module.js'; 
-import { OrbitControls } from '../libs/three/jsm/OrbitControls.js'; 
-import { GLTFLoader } from '../libs/three/jsm/GLTFLoader.js'; 
-import { Stats } from '../libs/stats.module.js'; 
-import { CanvasUI } from '../libs/CanvasUI.js'; 
-import { ARButton } from '../libs/ARButton.js'; 
-import { LoadingBar } from '../libs/LoadingBar.js'; 
-import { Player } from '../libs/Player.js'; 
-import { ControllerGestures } from '../libs/ControllerGestures.js'; 
-import { RGBELoader } from '../libs/three/jsm/RGBELoader.js'; 
-
-class App { 
-    constructor() { 
-        const container = document.createElement('div'); 
-        document.body.appendChild(container); 
-
-        this.clock = new THREE.Clock(); 
-
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100); 
-        this.camera.position.set(0, 0, 5); 
-
-        this.scene = new THREE.Scene(); 
-
-        const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 2); 
-        ambient.position.set(0.5, 1, 0.25); 
-        this.scene.add(ambient); 
-
-        const light = new THREE.DirectionalLight(); 
-        light.position.set(0.2, 1, 1); 
-        this.scene.add(light); 
-
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
-        this.renderer.setPixelRatio(window.devicePixelRatio); 
-        this.renderer.setSize(window.innerWidth, window.innerHeight); 
-        this.renderer.outputEncoding = THREE.sRGBEncoding; 
-        container.appendChild(this.renderer.domElement); 
-
-        this.setEnvironment(); 
-
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement); 
-        this.controls.target.set(0, 3.5, 0); 
-        this.controls.update(); 
-
-        this.stats = new Stats(); 
-        document.body.appendChild(this.stats.dom); 
-
-        this.origin = new THREE.Vector3(); 
-        this.euler = new THREE.Euler(); 
-        this.quaternion = new THREE.Quaternion(); 
-
-        this.initScene(); 
-        this.setupXR(); 
-        this.loadKnight(); 
-        window.addEventListener('resize', this.resize.bind(this)); 
-    } 
-
-    setEnvironment() { 
-        const loader = new RGBELoader().setDataType(THREE.UnsignedByteType); 
-        const pmremGenerator = new THREE.PMREMGenerator(this.renderer); 
-        pmremGenerator.compileEquirectangularShader(); 
-
-        const self = this; 
-
-        loader.load('../assets/hdr/venice_sunset_1k.hdr', (texture) => { 
-            const envMap = pmremGenerator.fromEquirectangular(texture).texture; 
-            pmremGenerator.dispose(); 
-
-            self.scene.environment = envMap; 
-        }, undefined, (err) => { 
-            console.error('An error occurred setting the environment'); 
-        }); 
-    } 
-
-    resize() { 
-        this.camera.aspect = window.innerWidth / window.innerHeight; 
-        this.camera.updateProjectionMatrix(); 
-        this.renderer.setSize(window.innerWidth, window.innerHeight); 
-    } 
-
-    loadKnight() { 
-        this.loadingBar = new LoadingBar(); 
-        const loader = new GLTFLoader().setPath('../assets/'); 
-        const self = this; 
-
-        loader.load( 
-            'knight2.glb', 
-            function (gltf) { 
-                const object = gltf.scene.children[5]; 
-
-                const options = { 
-                    object: object, 
-                    speed: 0.5, 
-                    assetsPath: self.assetsPath, 
-                    loader: loader, 
-                    animations: gltf.animations, 
-                    clip: gltf.animations[0], 
-                    app: self, 
-                    name: 'knight', 
-                    npc: false 
-                }; 
-
-                self.knight = new Player(options); 
-
-                self.knight.object.visible = true; 
-
-                self.knight.action = 'Dance'; 
-                const scale = 0.005; 
-                self.knight.object.scale.set(scale, scale, scale); 
-
-                self.knight.object.position.set(0, 0, -5); 
-
-                self.loadingBar.visible = false; 
-                self.renderer.setAnimationLoop(self.render.bind(self)); 
-            }, 
-            function (xhr) { 
-                self.loadingBar.progress = xhr.loaded / xhr.total; 
-            }, 
-            function (error) { 
-                console.error('An error happened', error); 
+ setupXR() {
+        this.renderer.xr.enabled = true;
+    
+        const onSessionStart = () => {
+            console.log('XR session started');
+            this.ui.mesh.position.set(0, -0.15, -0.3);
+            this.camera.add(this.ui.mesh);
+            this.setupHitTesting(); // Call setupHitTesting after the XR session starts
+        };
+        
+        // Define the onSessionEnd function
+        const onSessionEnd = () => {
+            console.log('XR session ended');
+            this.camera.remove(this.ui.mesh);
+        };
+        
+        // Attach the onSessionStart function to the 'sessionstart' event listener
+        this.renderer.xr.addEventListener('sessionstart', onSessionStart);
+        
+        // Attach the onSessionEnd function to the 'sessionend' event listener
+        this.renderer.xr.addEventListener('sessionend', onSessionEnd);
+        // Initialize XR button
+        const btn = new ARButton(this.renderer, { 
+            onSessionStart: () => this.onSessionStart(), 
+            onSessionEnd: () => this.onSessionEnd(), 
+            sessionInit: { 
+                requiredFeatures: ['hit-test'], 
+                optionalFeatures: ['dom-overlay'], 
+                domOverlay: { root: document.body } 
             } 
-        ); 
-    } 
-
-    initScene() { 
-        this.reticle = new THREE.Mesh( 
-            new THREE.RingBufferGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2), 
-            new THREE.MeshBasicMaterial() 
-        ); 
-
-        this.reticle.matrixAutoUpdate = false; 
-        this.reticle.visible = false; 
-        this.scene.add(this.reticle); 
-
-        this.isDragging = false; 
-        this.dragStartPosition = new THREE.Vector3(); 
-
-        this.createUI(); 
-    } 
-
-    createUI() { 
-        const config = { 
-            panelSize: { width: 0.15, height: 0.038 }, 
-            height: 128, 
-            info: { type: "text" } 
-        }; 
-        const content = { 
-            info: "Debug info" 
-        }; 
-
-        const ui = new CanvasUI(content, config); 
-
-        this.ui = ui; 
-    } 
-
-    setupXR() { 
-        this.renderer.xr.enabled = true; 
+        }); 
+        
+        // Check if hit testing feature is supported by the device
+        if (!navigator.xr || !navigator.xr.isSessionSupported || !navigator.xr.isSessionSupported('immersive-ar')) {
+            console.error('AR hit testing is not supported on this device/browser.');
+            return;
+        }
     
-        const onSessionStart = () => { 
-            console.log('XR session started'); 
-            this.ui.mesh.position.set(0, -0.15, -0.3); 
-            this.camera.add(this.ui.mesh); 
-        }; 
+        console.log('AR hit testing is supported.');
     
-        const onSessionEnd = () => { 
-            console.log('XR session ended'); 
-            this.camera.remove(this.ui.mesh); 
-        }; 
-    
-        // Initialize XR button 
-        const arButtonOptions = { 
-    onSessionStart: onSessionStart, 
-    onSessionEnd: onSessionEnd, 
-    sessionInit: { 
-        requiredFeatures: ['hit-test'], 
-        optionalFeatures: ['dom-overlay'], 
-        domOverlay: { root: document.body } 
-    } 
-}; 
-const arButton = new ARButton(this.renderer, arButtonOptions); 
-        // Setup hit testing and controller gestures
-        this.setupHitTesting();
+        //this.setupHitTesting();
         this.setupControllerGestures();
     }
+    
 
     setupHitTesting() {
         const self = this;
@@ -358,4 +219,3 @@ const arButton = new ARButton(this.renderer, arButtonOptions);
 }
 
 export { App };
- 
