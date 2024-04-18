@@ -1,12 +1,12 @@
 import * as THREE from '../libs/three/three.module.js'; 
-//import { OrbitControls } from '../libs/three/jsm/OrbitControls.js'; 
+import { OrbitControls } from '../libs/three/jsm/OrbitControls.js'; 
 import { GLTFLoader } from '../libs/three/jsm/GLTFLoader.js'; 
-//import { Stats } from '../libs/stats.module.js'; 
-//import { CanvasUI } from '../libs/CanvasUI.js'; 
+import { Stats } from '../libs/stats.module.js'; 
+import { CanvasUI } from '../libs/CanvasUI.js'; 
 import { ARButton } from '../libs/ARButton.js'; 
 import { LoadingBar } from '../libs/LoadingBar.js'; 
 import { Player } from '../libs/Player.js'; 
-//import { ControllerGestures } from '../libs/ControllerGestures.js'; 
+import { ControllerGestures } from '../libs/ControllerGestures.js'; 
 import { RGBELoader } from '../libs/three/jsm/RGBELoader.js'; 
 
 
@@ -20,7 +20,7 @@ class App{
         
         this.loadingBar = new LoadingBar();
 
-		this.assetsPath = '../assets/';
+		
         
 		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 		this.camera.position.set( 0, 1.6, 3 );
@@ -46,8 +46,8 @@ class App{
         
         this.initScene();
         this.setupXR();
-		
-		window.addEventListener('resize', this.resize.bind(this));
+		this.loadKnight();
+	window.addEventListener('resize', this.resize.bind(this));
         
 	}
     
@@ -76,7 +76,7 @@ class App{
     }
     
     loadKnight(){
-	    const loader = new GLTFLoader().setPath(this.assetsPath);
+	    const loader = new GLTFLoader().setPath('../assets/');
 		const self = this;
 		
 		// Load a GLTF resource
@@ -134,7 +134,7 @@ class App{
         this.reticle.visible = false;
         this.scene.add( this.reticle );
         
-        this.loadKnight();
+        //this.loadKnight();
     }
     
     setupXR(){
@@ -211,7 +211,7 @@ class App{
     }
 
 
-    /*render( timestamp, frame ) {
+    render( timestamp, frame ) {
         const dt = this.clock.getDelta();
         if (this.knight) this.knight.update(dt);
 
@@ -229,31 +229,9 @@ class App{
         
         /*if (this.knight.calculatedPath && this.knight.calculatedPath.length>0){
             console.log( `path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
-        }
+        }*/
     
 }
-
-}*/
-
-render(timestamp, frame) {
-    const dt = this.clock.getDelta();
-    if (this.knight) this.knight.update(dt);
-
-    if (frame) {
-        if (this.hitTestSourceRequested === false) {
-            // Call requestHitTestSource() method from setupHitTesting() if it's not requested yet
-            this.setupHitTesting();
-        }
-
-        if (this.hitTestSource) {
-            // Call getHitTestResults() method if hit test source is available
-            this.getHitTestResults(frame);
-        }
-    }
-
-    this.renderer.render(this.scene, this.camera);
 }
-}
-
 
 export { App };
