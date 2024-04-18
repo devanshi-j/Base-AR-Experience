@@ -44,7 +44,7 @@ class App{
         
         this.initScene();
         this.setupXR();
-	
+	this.setupHitTesting();
 		
 	window.addEventListener('resize', this.resize.bind(this));
         
@@ -165,11 +165,11 @@ class App{
         
         this.scene.add( this.controller ); 
 
-	this.setupHitTesting();
+	
     }
 
     setupHitTesting(){
-    function requestHitTestSource(){
+    /*function requestHitTestSource(){
         const self = this;
         
         const session = this.renderer.xr.getSession();
@@ -194,9 +194,27 @@ class App{
 
         this.hitTestSourceRequested = true;
 
-    }
+    }*/
+
+ const requestHitTestSource = () => { // Arrow function
+        const session = this.renderer.xr.getSession();
+
+        session.requestReferenceSpace('viewer').then((referenceSpace) => { // Arrow function
+            session.requestHitTestSource({ space: referenceSpace }).then((source) => { // Arrow function
+                this.hitTestSource = source; // Use "this" to refer to the App instance
+            });
+        });
+
+        session.addEventListener('end', () => { // Arrow function
+            this.hitTestSourceRequested = false; // Use "this" to refer to the App instance
+            this.hitTestSource = null; // Use "this" to refer to the App instance
+            this.referenceSpace = null; // Use "this" to refer to the App instance
+        });
+
+        this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
+    };
     
-    function getHitTestResults( frame ){
+    const getHitTestResults( frame ){
         const hitTestResults = frame.getHitTestResults( this.hitTestSource );
 
         if ( hitTestResults.length ) {
@@ -215,8 +233,8 @@ class App{
         }
 
     }
-	  requestHitTestSource();
-	  getHitTestResults();
+	  this.requestHitTestSource();
+	  this.getHitTestResults();
     }
 
     render( timestamp, frame ) {
