@@ -175,17 +175,17 @@ class App {
         }; 
     
         // Initialize XR button 
-        const arButtonOptions = { 
-            onSessionStart: onSessionStart, 
-            onSessionEnd: onSessionEnd, 
-            sessionInit: { 
-                requiredFeatures: ['hit-test'], 
-                optionalFeatures: ['dom-overlay'], 
-                domOverlay: { root: document.body } 
-            } 
-        }; 
-        const arButton = new ARButton(this.renderer, arButtonOptions); 
-        document.body.appendChild(arButton.domElement); 
+        const arButtonOptions = {
+    onSessionStart: onSessionStart,
+    onSessionEnd: onSessionEnd,
+    sessionInit: {
+        requiredFeatures: ['hit-test'],
+        optionalFeatures: ['dom-overlay'],
+        domOverlay: { root: document.body }
+    }
+};
+
+const arButton = new ARButton(this.renderer, arButtonOptions);
     
         // Setup hit testing and controller gestures
         this.setupHitTesting();
