@@ -169,7 +169,7 @@ class App{
     }
 
     setupHitTesting(){
-    requestHitTestSource(){
+    function requestHitTestSource(){
         const self = this;
         
         const session = this.renderer.xr.getSession();
@@ -196,7 +196,7 @@ class App{
 
     }
     
-    getHitTestResults( frame ){
+    function getHitTestResults( frame ){
         const hitTestResults = frame.getHitTestResults( this.hitTestSource );
 
         if ( hitTestResults.length ) {
@@ -215,8 +215,8 @@ class App{
         }
 
     }
-	 this. requestHitTestSource();
-	 this. getHitTestResults();
+	  requestHitTestSource();
+	  getHitTestResults();
     }
 
     render( timestamp, frame ) {
