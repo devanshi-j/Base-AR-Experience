@@ -11,6 +11,8 @@ import { RGBELoader } from '../libs/three/jsm/RGBELoader.js';
 
 
 
+
+
 class App{
 	constructor(){
 		const container = document.createElement( 'div' );
@@ -20,7 +22,7 @@ class App{
         
         this.loadingBar = new LoadingBar();
 
-		
+		this.assetsPath = '../assets/';
         
 		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 		this.camera.position.set( 0, 1.6, 3 );
@@ -46,8 +48,8 @@ class App{
         
         this.initScene();
         this.setupXR();
-		this.loadKnight();
-	window.addEventListener('resize', this.resize.bind(this));
+		
+		window.addEventListener('resize', this.resize.bind(this));
         
 	}
     
@@ -76,7 +78,7 @@ class App{
     }
     
     loadKnight(){
-	    const loader = new GLTFLoader().setPath('../assets/');
+	    const loader = new GLTFLoader().setPath(this.assetsPath);
 		const self = this;
 		
 		// Load a GLTF resource
@@ -134,7 +136,7 @@ class App{
         this.reticle.visible = false;
         this.scene.add( this.reticle );
         
-        //this.loadKnight();
+        this.loadKnight();
     }
     
     setupXR(){
@@ -167,49 +169,52 @@ class App{
         this.scene.add( this.controller );    
     }
     
-
-    
-
-    setupHitTesting() {
+    requestHitTestSource(){
         const self = this;
+        
+        const session = this.renderer.xr.getSession();
 
-        function requestHitTestSource() {
-            const session = self.renderer.xr.getSession();
+        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
+            
+            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
 
-            session.requestReferenceSpace('viewer').then(function(referenceSpace) {
-                session.requestHitTestSource({ space: referenceSpace }).then(function(source) {
-                    self.hitTestSource = source;
-                });
-            });
+                self.hitTestSource = source;
 
-            session.addEventListener('end', function() {
-                self.hitTestSourceRequested = false;
-                self.hitTestSource = null;
-                self.referenceSpace = null;
-            });
+            } );
 
-            self.hitTestSourceRequested = true;
-        }
+        } );
 
-        function getHitTestResults(frame) {
-            const hitTestResults = frame.getHitTestResults(self.hitTestSource);
+        session.addEventListener( 'end', function () {
 
-            if (hitTestResults.length) {
-                const referenceSpace = self.renderer.xr.getReferenceSpace();
-                const hit = hitTestResults[0];
-                const pose = hit.getPose(referenceSpace);
+            self.hitTestSourceRequested = false;
+            self.hitTestSource = null;
+            self.referenceSpace = null;
 
-                self.reticle.visible = true;
-                self.reticle.matrix.fromArray(pose.transform.matrix);
-            } else {
-                self.reticle.visible = false;
-            }
-        }
+        } );
 
-        requestHitTestSource();
-        getHitTestResults();
+        this.hitTestSourceRequested = true;
+
     }
+    
+    getHitTestResults( frame ){
+        const hitTestResults = frame.getHitTestResults( this.hitTestSource );
 
+        if ( hitTestResults.length ) {
+            
+            const referenceSpace = this.renderer.xr.getReferenceSpace();
+            const hit = hitTestResults[ 0 ];
+            const pose = hit.getPose( referenceSpace );
+
+            this.reticle.visible = true;
+            this.reticle.matrix.fromArray( pose.transform.matrix );
+
+        } else {
+
+            this.reticle.visible = false;
+
+        }
+
+    }
 
     render( timestamp, frame ) {
         const dt = this.clock.getDelta();
@@ -230,8 +235,7 @@ class App{
         /*if (this.knight.calculatedPath && this.knight.calculatedPath.length>0){
             console.log( `path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
         }*/
-    
-}
+    }
 }
 
 export { App };
