@@ -9,6 +9,8 @@ import { Player } from '../libs/Player.js';
 import { ControllerGestures } from '../libs/ControllerGestures.js'; 
 import { RGBELoader } from '../libs/three/jsm/RGBELoader.js'; 
 
+
+
 class App{
 	constructor(){
 		const container = document.createElement( 'div' );
@@ -44,9 +46,8 @@ class App{
         
         this.initScene();
         this.setupXR();
-	this.setupHitTesting();
 		
-	window.addEventListener('resize', this.resize.bind(this));
+		window.addEventListener('resize', this.resize.bind(this));
         
 	}
     
@@ -163,88 +164,57 @@ class App{
         this.controller = this.renderer.xr.getController( 0 );
         this.controller.addEventListener( 'select', onSelect );
         
-        this.scene.add( this.controller ); 
-
-	
+        this.scene.add( this.controller );    
     }
+    
 
     
-    /*function requestHitTestSource(){
+
+    setupHitTesting() {
         const self = this;
-        
+
+       function requestHitTestSource(){
         const session = this.renderer.xr.getSession();
-
-        session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
-            
-            session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
-
-                self.hitTestSource = source;
-
-            } );
-
-        } );
-
-        session.addEventListener( 'end', function () {
-
-            self.hitTestSourceRequested = false;
-            self.hitTestSource = null;
-            self.referenceSpace = null;
-
-        } );
-
-        this.hitTestSourceRequested = true;
-
-    }*/
-setupHitTesting() {
-    const requestHitTestSource = () => {
-        const session = this.renderer.xr.getSession();
-
-        if (!session) {
-            console.error('WebXR session is not available.');
-            return;
-        }
 
         session.requestReferenceSpace('viewer').then((referenceSpace) => {
             session.requestHitTestSource({ space: referenceSpace }).then((source) => {
-                this.hitTestSource = source; // Use "this" to refer to the App instance
+                this.hitTestSource = source;
+    
+                session.addEventListener('end', () => {
+                    this.hitTestSourceRequested = false;
+                    this.hitTestSource = null;
+                    this.referenceSpace = null;
+                });
+    
+                this.hitTestSourceRequested = true;
+
+                getHitTestResults();
             });
         });
-
-        session.addEventListener('end', () => {
-            this.hitTestSourceRequested = false; // Use "this" to refer to the App instance
-            this.hitTestSource = null; // Use "this" to refer to the App instance
-            this.referenceSpace = null; // Use "this" to refer to the App instance
-        });
-
-        this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
-    };
-
-    const getHitTestResults = (frame) => {
-        if (!this.hitTestSource) {
-            console.warn('Hit test source is not available.');
-            return;
+    }
+        
+        function getHitTestResults( frame ){
+            const hitTestResults = frame.getHitTestResults( this.hitTestSource );
+    
+            if ( hitTestResults.length ) {
+                
+                const referenceSpace = this.renderer.xr.getReferenceSpace();
+                const hit = hitTestResults[ 0 ];
+                const pose = hit.getPose( referenceSpace );
+    
+                this.reticle.visible = true;
+                this.reticle.matrix.fromArray( pose.transform.matrix );
+    
+            } else {
+    
+                this.reticle.visible = false;
+    
+            }
+    
+           requestHitTestSource();
+            //getHitTestResults();
         }
-
-        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-
-        if (hitTestResults.length) {
-            const referenceSpace = this.renderer.xr.getReferenceSpace();
-            const hit = hitTestResults[0];
-            const pose = hit.getPose(referenceSpace);
-
-            this.reticle.visible = true;
-            this.reticle.matrix.fromArray(pose.transform.matrix);
-        } else {
-            this.reticle.visible = false;
-        }
-    };
-
-    requestHitTestSource();
-    hitTestResults();
-    // Call getHitTestResults() only when the hit test source is available
-    // which might not be immediately after requestHitTestSource()
-    // getHitTestResults();
-}
+    }
 
 
     render( timestamp, frame ) {
@@ -265,8 +235,14 @@ setupHitTesting() {
         
         /*if (this.knight.calculatedPath && this.knight.calculatedPath.length>0){
             console.log( `path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
-        }*/
-    }
+       */
+       
+        }
+    
 }
 
+
+
+
 export { App };
+
