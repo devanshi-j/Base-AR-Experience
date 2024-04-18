@@ -233,8 +233,8 @@ class App{
         }
 
     }
-	  this.requestHitTestSource();
-	  this.getHitTestResults();
+	requestHitTestSource();
+	getHitTestResults();
     }
 
     render( timestamp, frame ) {
