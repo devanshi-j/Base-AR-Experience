@@ -214,7 +214,7 @@ class App{
         this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
     };
     
-    const getHitTestResults( frame ){
+    const getHitTestResults = ( frame ) => {
         const hitTestResults = frame.getHitTestResults( this.hitTestSource );
 
         if ( hitTestResults.length ) {
