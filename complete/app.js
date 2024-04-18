@@ -195,53 +195,57 @@ class App{
         this.hitTestSourceRequested = true;
 
     }*/
-setupHitTesting(){
-const requestHitTestSource = () => {
-    const session = this.renderer.xr.getSession();
+setupHitTesting() {
+    const requestHitTestSource = () => {
+        const session = this.renderer.xr.getSession();
 
-    if (!session) {
-        console.error('WebXR session is not available.');
-        return;
-    }
-
-    session.requestReferenceSpace('viewer').then((referenceSpace) => {
-        session.requestHitTestSource({ space: referenceSpace }).then((source) => {
-            this.hitTestSource = source; // Use "this" to refer to the App instance
-        });
-    });
-
-    session.addEventListener('end', () => {
-        this.hitTestSourceRequested = false; // Use "this" to refer to the App instance
-        this.hitTestSource = null; // Use "this" to refer to the App instance
-        this.referenceSpace = null; // Use "this" to refer to the App instance
-    });
-
-    this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
-};
-
-    
-    const getHitTestResults = ( frame ) => {
-        const hitTestResults = frame.getHitTestResults( this.hitTestSource );
-
-        if ( hitTestResults.length ) {
-            
-            const referenceSpace = this.renderer.xr.getReferenceSpace();
-            const hit = hitTestResults[ 0 ];
-            const pose = hit.getPose( referenceSpace );
-
-            this.reticle.visible = true;
-            this.reticle.matrix.fromArray( pose.transform.matrix );
-
-        } else {
-
-            this.reticle.visible = false;
-
+        if (!session) {
+            console.error('WebXR session is not available.');
+            return;
         }
 
-    }
-	requestHitTestSource();
-	getHitTestResults();
-    }
+        session.requestReferenceSpace('viewer').then((referenceSpace) => {
+            session.requestHitTestSource({ space: referenceSpace }).then((source) => {
+                this.hitTestSource = source; // Use "this" to refer to the App instance
+            });
+        });
+
+        session.addEventListener('end', () => {
+            this.hitTestSourceRequested = false; // Use "this" to refer to the App instance
+            this.hitTestSource = null; // Use "this" to refer to the App instance
+            this.referenceSpace = null; // Use "this" to refer to the App instance
+        });
+
+        this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
+    };
+
+    const getHitTestResults = (frame) => {
+        if (!this.hitTestSource) {
+            console.warn('Hit test source is not available.');
+            return;
+        }
+
+        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
+
+        if (hitTestResults.length) {
+            const referenceSpace = this.renderer.xr.getReferenceSpace();
+            const hit = hitTestResults[0];
+            const pose = hit.getPose(referenceSpace);
+
+            this.reticle.visible = true;
+            this.reticle.matrix.fromArray(pose.transform.matrix);
+        } else {
+            this.reticle.visible = false;
+        }
+    };
+
+    requestHitTestSource();
+    hitTestResults();
+    // Call getHitTestResults() only when the hit test source is available
+    // which might not be immediately after requestHitTestSource()
+    // getHitTestResults();
+}
+
 
     render( timestamp, frame ) {
         const dt = this.clock.getDelta();
