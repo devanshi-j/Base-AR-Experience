@@ -166,7 +166,7 @@ class App{
         
         this.scene.add( this.controller );    
 
-	 this.requestHitTestSource();
+	 requestHitTestSource();
     }
     
 
@@ -190,7 +190,7 @@ class App{
     
                 this.hitTestSourceRequested = true;
 
-                this.getHitTestResults();
+                getHitTestResults();
             });
         });
     }
