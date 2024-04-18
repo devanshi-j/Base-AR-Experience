@@ -252,7 +252,7 @@ setupHitTesting ()  {
     this.gestures = new ControllerGestures(this.renderer);
     const self = this;
 
-    const onSelect  = () => { 
+   const onSelect  = () => { 
         console.log('Controller select event triggered'); 
         if (this.knight === undefined) return; 
  
@@ -271,14 +271,23 @@ setupHitTesting ()  {
     this.controller.addEventListener( 'select', onSelect ); 
      this.scene.add( this.controller );     
 
-    this.gestures.addEventListener('tap', (ev) => {
+    /*this.gestures.addEventListener('tap', (ev) => {
         self.ui.updateElement('info', 'tap');
         if (!self.knight.object.visible) {
             self.knight.object.visible = true;
             self.knight.object.position.set(0, -0.3, -0.5).add(ev.position);
             self.scene.add(self.knight.object);
         }
-    });
+    });*/
+
+   this.gestures.addEventListener('tap', (ev) => {
+            this.ui.updateElement('info', 'tap');
+            if (!this.knight.object.visible) {
+                this.knight.object.visible = true;
+                this.knight.object.position.set(0, -0.3, -0.5).add(ev.position);
+                this.scene.add(this.knight.object);
+            }
+        });
 
     this.gestures.addEventListener('doubletap', (ev) => {
         self.ui.updateElement('info', 'doubletap');
