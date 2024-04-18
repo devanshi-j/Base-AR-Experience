@@ -168,7 +168,7 @@ class App{
 	
     }
 
-    setupHitTesting(){
+    
     /*function requestHitTestSource(){
         const self = this;
         
@@ -195,24 +195,30 @@ class App{
         this.hitTestSourceRequested = true;
 
     }*/
+setupHitTesting(){
+const requestHitTestSource = () => {
+    const session = this.renderer.xr.getSession();
 
- const requestHitTestSource = () => { // Arrow function
-        const session = this.renderer.xr.getSession();
+    if (!session) {
+        console.error('WebXR session is not available.');
+        return;
+    }
 
-        session.requestReferenceSpace('viewer').then((referenceSpace) => { // Arrow function
-            session.requestHitTestSource({ space: referenceSpace }).then((source) => { // Arrow function
-                this.hitTestSource = source; // Use "this" to refer to the App instance
-            });
+    session.requestReferenceSpace('viewer').then((referenceSpace) => {
+        session.requestHitTestSource({ space: referenceSpace }).then((source) => {
+            this.hitTestSource = source; // Use "this" to refer to the App instance
         });
+    });
 
-        session.addEventListener('end', () => { // Arrow function
-            this.hitTestSourceRequested = false; // Use "this" to refer to the App instance
-            this.hitTestSource = null; // Use "this" to refer to the App instance
-            this.referenceSpace = null; // Use "this" to refer to the App instance
-        });
+    session.addEventListener('end', () => {
+        this.hitTestSourceRequested = false; // Use "this" to refer to the App instance
+        this.hitTestSource = null; // Use "this" to refer to the App instance
+        this.referenceSpace = null; // Use "this" to refer to the App instance
+    });
 
-        this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
-    };
+    this.hitTestSourceRequested = true; // Use "this" to refer to the App instance
+};
+
     
     const getHitTestResults = ( frame ) => {
         const hitTestResults = frame.getHitTestResults( this.hitTestSource );
