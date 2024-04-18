@@ -202,7 +202,7 @@ setupHitTesting ()  {
     let hitTestSource = null;
     let referenceSpace = null;
   
-    const requestHitTestSource  = () => {
+    requestHitTestSource  = () => {
       const session = self.renderer.xr.getSession();
   
       if (session) {
@@ -224,7 +224,7 @@ setupHitTesting ()  {
       }
     }
   
-    const getHitTestResults = (frame) => {
+    getHitTestResults = (frame) => {
       if (!hitTestSourceRequested || !hitTestSource) return;
   
       const hitTestResults = frame.getHitTestResults(hitTestSource);
