@@ -9,10 +9,6 @@ import { Player } from '../libs/Player.js';
 import { ControllerGestures } from '../libs/ControllerGestures.js'; 
 import { RGBELoader } from '../libs/three/jsm/RGBELoader.js'; 
 
-
-
-
-
 class App{
 	constructor(){
 		const container = document.createElement( 'div' );
@@ -168,7 +164,8 @@ class App{
         
         this.scene.add( this.controller );    
     }
-    
+
+    setupHitTesting(){
     requestHitTestSource(){
         const self = this;
         
@@ -214,6 +211,9 @@ class App{
 
         }
 
+    }
+	 this. requestHitTestSource();
+	 this. getHitTestResults();
     }
 
     render( timestamp, frame ) {
