@@ -165,8 +165,6 @@ class App{
         this.controller.addEventListener( 'select', onSelect );
         
         this.scene.add( this.controller );    
-
-	 requestHitTestSource();
     }
     
 
@@ -213,7 +211,7 @@ class App{
     
             }
     
-          
+           requestHitTestSource();
             //getHitTestResults();
         }
     }
