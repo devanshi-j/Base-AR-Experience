@@ -44,8 +44,9 @@ class App{
         
         this.initScene();
         this.setupXR();
+	
 		
-		window.addEventListener('resize', this.resize.bind(this));
+	window.addEventListener('resize', this.resize.bind(this));
         
 	}
     
@@ -162,7 +163,9 @@ class App{
         this.controller = this.renderer.xr.getController( 0 );
         this.controller.addEventListener( 'select', onSelect );
         
-        this.scene.add( this.controller );    
+        this.scene.add( this.controller ); 
+
+	this.setupHitTesting();
     }
 
     setupHitTesting(){
