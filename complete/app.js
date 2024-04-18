@@ -188,7 +188,7 @@ class App{
     
                 this.hitTestSourceRequested = true;
 
-                getHitTestResults();
+                this.getHitTestResults();
             });
         });
     }
@@ -211,7 +211,7 @@ class App{
     
             }
     
-           requestHitTestSource();
+           this.requestHitTestSource();
             //getHitTestResults();
         }
     }
