@@ -38,6 +38,7 @@ class App {
         this.workingVec3 = new THREE.Vector3();
         this.initScene();
         this.setupXR();
+        this.setupControllerGestures();
         window.addEventListener('resize', this.resize.bind(this));
     }
 
@@ -157,6 +158,8 @@ class App {
         this.controller = this.renderer.xr.getController(0);
         this.controller.addEventListener('select', onSelect);
         this.scene.add(this.controller);
+
+        
     }
 
     /*setupHitTesting() {
@@ -236,6 +239,99 @@ class App {
 
         }
 
+    }
+
+     setupControllerGestures() {
+        this.gestures = new ControllerGestures(this.renderer);
+            
+        const self = this;
+
+        const onSelect = () => { 
+            console.log('Controller select event triggered'); 
+            if (this.knight === undefined) return; 
+
+            if (this.reticle.visible) { 
+                if (this.knight.object.visible) { 
+                    this.workingVec3.setFromMatrixPosition(this.reticle.matrix); 
+                    this.knight.newPath(this.workingVec3); 
+                } else { 
+                    this.knight.object.position.setFromMatrixPosition(this.reticle.matrix); 
+                    this.knight.object.visible = true; 
+                } 
+            } 
+        }; 
+
+        this.controller = this.renderer.xr.getController( 0 ); 
+        this.controller.addEventListener( 'select', onSelect ); 
+        this.scene.add( this.controller ); 
+
+        this.gestures.addEventListener('tap', (ev) => {
+            this.ui.updateElement('info', 'tap');
+            if (!this.knight.object.visible) {
+                this.knight.object.visible = true;
+                this.knight.object.position.set(0, -0.3, -0.5).add(ev.position);
+                this.scene.add(this.knight.object);
+            }
+        });
+
+        this.gestures.addEventListener('doubletap', (ev) => {
+            self.ui.updateElement('info', 'doubletap');
+        });
+
+        this.gestures.addEventListener('press', (ev) => {
+            self.ui.updateElement('info', 'press');
+        });
+
+        this.gestures.addEventListener('press', (ev) => {
+            if (!self.knight.object.visible) return;
+
+            self.isDragging = true;
+            self.dragStartPosition.copy(self.knight.object.position);
+            self.ui.updateElement('info', 'Drag started');
+        });
+
+        this.gestures.addEventListener('pan', (ev) => {
+            if (!self.isDragging) return;
+
+            if (ev.initialise !== undefined) {
+                self.startPosition = self.knight.object.position.clone();
+            } else {
+                const dragSensitivity = 3;
+                const delta = ev.delta.multiplyScalar(dragSensitivity);
+                const newPosition = self.startPosition.clone().add(delta);
+
+                self.knight.object.position.copy(newPosition);
+                self.ui.updateElement('info', `Dragging: x:${delta.x.toFixed(3)}, y:${delta.y.toFixed(3)}, z:${delta.z.toFixed(3)}`);
+            }
+        });
+
+        this.gestures.addEventListener('swipe', (ev) => {
+            self.ui.updateElement('info', `swipe ${ev.direction}`);
+            if (self.knight.object.visible) {
+                self.knight.object.visible = false;
+                self.scene.remove(self.knight.object);
+            }
+        });
+
+        this.gestures.addEventListener('pinch', (ev) => {
+            if (ev.initialise !== undefined) {
+                self.startScale = self.knight.object.scale.clone();
+            } else {
+                const scale = self.startScale.clone().multiplyScalar(ev.scale);
+                self.knight.object.scale.copy(scale);
+                self.ui.updateElement('info', `pinch delta:${ev.delta.toFixed(3)} scale:${ev.scale.toFixed(2)}`);
+            }
+        });
+
+        this.gestures.addEventListener('rotate', (ev) => {
+            if (ev.initialise !== undefined) {
+                self.startQuaternion = self.knight.object.quaternion.clone();
+            } else {
+                self.knight.object.quaternion.copy(self.startQuaternion);
+                self.knight.object.rotateY(ev.theta);
+                self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
+            }
+        });
     }
 
     render(timestamp, frame) {
