@@ -190,7 +190,8 @@ class App {
         this.controller.addEventListener('select', onSelect);
         this.scene.add(this.controller);
 
-          this.setupControllerGestures();
+       this.setupControllerGestures();
+       console.log("Controller gestures setup completed.");
     }
 
     /*setupHitTesting() {
@@ -363,7 +364,7 @@ class App {
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
             }
         });
-           this.setupControllerGestures();
+          
     }
 
     render(timestamp, frame) {
