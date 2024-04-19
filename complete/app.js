@@ -110,13 +110,35 @@ class App {
 
     setupXR() {
         this.renderer.xr.enabled = true;
-        const btn = new ARButton(this.renderer, {
-            sessionInit: {
-                requiredFeatures: ['hit-test'],
-                optionalFeatures: ['dom-overlay'],
-                domOverlay: { root: document.body }
-            }
-        });
+
+
+        const onSessionStart = () => {
+            console.log('XR session started');
+            this.ui.mesh.position.set(0, -0.15, -0.3);
+            this.camera.add(this.ui.mesh);
+            this.setupHitTesting(); // Call setupHitTesting after the XR session starts
+        };
+        
+        // Define the onSessionEnd function
+        const onSessionEnd = () => {
+            console.log('XR session ended');
+            this.camera.remove(this.ui.mesh);
+        };
+        
+        // Attach the onSessionStart function to the 'sessionstart' event listener
+        this.renderer.xr.addEventListener('sessionstart', onSessionStart);
+        
+        // Attach the onSessionEnd function to the 'sessionend' event listener
+        this.renderer.xr.addEventListener('sessionend', onSessionEnd);
+        const btn = new ARButton(this.renderer, { 
+            onSessionStart: () => this.onSessionStart(), 
+            onSessionEnd: () => this.onSessionEnd(), 
+            sessionInit: { 
+                requiredFeatures: ['hit-test'], 
+                optionalFeatures: ['dom-overlay'], 
+                domOverlay: { root: document.body } 
+            } 
+        }); 
         const self = this;
         this.hitTestSourceRequested = false;
         this.hitTestSource = null;
