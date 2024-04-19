@@ -51,7 +51,7 @@ class App {
        
         this.initScene();
         this.setupXR();
-        this.setupControllerGestures();
+      
         window.addEventListener('resize', this.resize.bind(this));
     }
 
@@ -190,7 +190,7 @@ class App {
         this.controller.addEventListener('select', onSelect);
         this.scene.add(this.controller);
 
-        
+          this.setupControllerGestures();
     }
 
     /*setupHitTesting() {
@@ -363,6 +363,7 @@ class App {
                 self.ui.updateElement('info', `rotate ${ev.theta.toFixed(3)}`);
             }
         });
+           this.setupControllerGestures();
     }
 
     render(timestamp, frame) {
