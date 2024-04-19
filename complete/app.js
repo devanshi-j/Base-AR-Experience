@@ -134,6 +134,10 @@ class App{
         this.scene.add( this.reticle );
         
         this.loadKnight();
+	console.log("Scene initialized successfully.");
+    } catch (error) {
+        console.error("Error initializing scene:", error);
+    }
     }
     
     setupXR(){
@@ -259,26 +263,29 @@ setupHitTesting() {
         }
     }
 
-    render( timestamp, frame ) {
-        const dt = this.clock.getDelta();
-        if (this.knight) this.knight.update(dt);
+   render(timestamp, frame) {
+    const dt = this.clock.getDelta();
+    if (this.knight) this.knight.update(dt);
 
-        const self = this;
-        
-        if ( frame ) {
-
-            if ( this.hitTestSourceRequested === false ) this.requestHitTestSource( )
-
-            if ( this.hitTestSource ) this.getHitTestResults( frame );
-
+    if (frame) {
+        if (!this.hitTestSourceRequested) {
+            console.log("Requesting hit test source...");
+            this.requestHitTestSource();
         }
 
-        this.renderer.render( this.scene, this.camera );
-        
-        /*if (this.knight.calculatedPath && this.knight.calculatedPath.length>0){
-            console.log( `path:${this.knight.calculatedPath[0].x.toFixed(2)}, ${this.knight.calculatedPath[0].y.toFixed(2)}, ${this.knight.calculatedPath[0].z.toFixed(2)} position: ${this.knight.object.position.x.toFixed(2)}, ${this.knight.object.position.y.toFixed(2)}, ${this.knight.object.position.z.toFixed(2)}`);
-        }*/
+        if (this.hitTestSource) {
+            console.log("Getting hit test results...");
+            this.getHitTestResults(frame);
+        }
+    }
+
+    try {
+        this.renderer.render(this.scene, this.camera);
+        console.log("Scene rendered successfully.");
+    } catch (error) {
+        console.error("Error rendering scene:", error);
     }
 }
+
 
 export { App };
