@@ -336,6 +336,9 @@ class App {
 
     render(timestamp, frame) {
         const dt = this.clock.getDelta();
+         this.stats.update();
+
+        
         if (this.knight) this.knight.update(dt);
         if (frame) {
             if (!this.hitTestSourceRequested) {
@@ -347,6 +350,16 @@ class App {
                 this.getHitTestResults(frame);
             }
         }
+
+        if (this.renderer.xr.isPresenting) {
+            this.gestures.update();
+            this.ui.update();
+        }
+
+        if (this.knight !== undefined) {
+            this.knight.update(dt);
+        }
+       
         try {
             this.renderer.render(this.scene, this.camera);
             console.log("Scene rendered successfully.");
