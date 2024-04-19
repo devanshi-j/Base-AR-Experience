@@ -20,7 +20,7 @@ class App{
         
         this.loadingBar = new LoadingBar();
 
-		this.assetsPath = '../assets/';
+		
         
 		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 		this.camera.position.set( 0, 1.6, 3 );
@@ -76,13 +76,13 @@ class App{
     }
     
     loadKnight(){
-	    const loader = new GLTFLoader().setPath(this.assetsPath);
+	    const loader = new GLTFLoader().setPath('../assets/');
 		const self = this;
 		
 		// Load a GLTF resource
 		loader.load(
 			// resource URL
-			`knight2.glb`,
+			'knight2.glb',
 			// called when the resource is loaded
 			function ( gltf ) {
 				const object = gltf.scene.children[5];
@@ -165,6 +165,8 @@ class App{
         this.controller.addEventListener( 'select', onSelect );
         
         this.scene.add( this.controller );    
+
+	
     }
     
 
