@@ -35,7 +35,20 @@ class App {
         this.renderer.outputEncoding = THREE.sRGBEncoding;
         container.appendChild(this.renderer.domElement);
         this.setEnvironment();
+
+         this.controls = new OrbitControls(this.camera, this.renderer.domElement); 
+        this.controls.target.set(0, 3.5, 0); 
+        this.controls.update(); 
+
+        this.stats = new Stats(); 
+        document.body.appendChild(this.stats.dom); 
+
+       
+        this.euler = new THREE.Euler(); 
+        this.quaternion = new THREE.Quaternion(); 
         this.workingVec3 = new THREE.Vector3();
+        this.origin = new THREE.Vector3(); 
+       
         this.initScene();
         this.setupXR();
         this.setupControllerGestures();
@@ -107,7 +120,25 @@ class App {
         this.scene.add(this.reticle);
         this.loadKnight();
         console.log("Scene initialized successfully.");
+
+        this.createUI(); 
     }
+
+    createUI() { 
+        const config = { 
+            panelSize: { width: 0.15, height: 0.038 }, 
+            height: 128, 
+            info: { type: "text" } 
+        }; 
+        const content = { 
+            info: "Debug info" 
+        }; 
+
+        const ui = new CanvasUI(content, config); 
+
+        this.ui = ui; 
+    } 
+
 
     setupXR() {
         this.renderer.xr.enabled = true;
